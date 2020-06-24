@@ -21,40 +21,77 @@ package ibcalpha.ibc;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 
-class EnableApiTask implements ConfigurationAction{
+class EnableApiTask implements ConfigurationAction {
 
     private final CommandChannel mChannel;
+    boolean mEnableRemoteConnections;
+    boolean mDisableReadonlyApi;
 
     private JDialog configDialog;
 
-    EnableApiTask(final CommandChannel channel) {
+    EnableApiTask(final CommandChannel channel, boolean enableRemoteConnections, boolean disableReadonlyApi) {
         mChannel = channel;
+        mEnableRemoteConnections = enableRemoteConnections;
+        mDisableReadonlyApi = disableReadonlyApi;
+    }
+
+    private void enableApi() throws IbcException {
+        JCheckBox cb = SwingUtils.findCheckBox(configDialog, "Enable ActiveX and Socket Clients");
+        if (cb == null) throw new IbcException("could not find Enable ActiveX checkbox");
+
+        if (cb.isSelected()) {
+            Utils.logToConsole("TWS is already configured to accept API connections");
+        } else {
+            cb.doClick();
+            Utils.logToConsole("TWS has been configured to accept API connections");
+        }
+    }
+
+    private void enableRemoteConnections() throws IbcException {
+        JCheckBox cb = SwingUtils.findCheckBox(configDialog, "Allow connections from localhost only");
+        if (cb == null) throw new IbcException("could not find localhost-only checkbox");
+
+        if (cb.isSelected()) {
+            cb.doClick();
+            Utils.logToConsole("TWS configured to allow remote connections");
+        } else {
+            Utils.logToConsole("TWS already configured to allow remote connections");
+        }
+    }
+
+    private void disableReadonlyApi() throws IbcException {
+        JCheckBox cb = SwingUtils.findCheckBox(configDialog, "Read-Only API");
+        if (cb == null) throw new IbcException("could not find Read-Only checkbox");
+
+        if (cb.isSelected()) {
+            cb.doClick();
+            Utils.logToConsole("TWS configured to allow read-write API");
+        } else {
+            Utils.logToConsole("TWS already configured to allow read-write API");
+        }
     }
 
     @Override public void run() {
         try {
             Utils.logToConsole("Doing ENABLEAPI configuration");
-            
             if (!Utils.selectConfigSection(configDialog, new String[] {"API","Settings"}))
                 // older versions of TWS don't have the Settings node below the API node
                 Utils.selectConfigSection(configDialog, new String[] {"API"});
 
-            JCheckBox cb = SwingUtils.findCheckBox(configDialog, "Enable ActiveX and Socket Clients");
-            if (cb == null) throw new IbcException("could not find Enable ActiveX checkbox");
-
-            if (!cb.isSelected()) {
-                cb.doClick();
-                SwingUtils.clickButton(configDialog, "OK");
-                Utils.logToConsole("TWS has been configured to accept API connections");
-                mChannel.writeAck("configured");
-            } else {
-                Utils.logToConsole("TWS is already configured to accept API connections");
-                mChannel.writeAck("already configured");
+            enableApi();
+            if (mEnableRemoteConnections) {
+                enableRemoteConnections();
+            }
+            if (mDisableReadonlyApi) {
+                disableReadonlyApi();
             }
         } catch (IbcException e) {
             Utils.logError("CommandServer: " + e.getMessage());
             mChannel.writeNack(e.getMessage());
         }
+
+        SwingUtils.clickButton(configDialog, "OK");
+        mChannel.writeAck("configured");
     }
 
     @Override

@@ -723,6 +723,25 @@ number.
 Then follow the advice in the previous section and ensure that each script
 file has the correct value for the `TWS_MAJOR_VRSN` variable.
 
+### Command Server Protocol
+
+The command server reads newline-terminated requests and writes
+newline-terminated replies.
+
+Valid requests:
+
+* `EXIT`: gracefully terminate the connection to the command server
+* `STOP`: graefully terminate TWS
+* `ENABLEAPI [enable-remote-connections] [disable-readonly-api]`: Enable the TWS API in TWS settings. If `enable-remote-connections` is specified, disable requirement for API connections to come from `localhost`. If `disable-readonly-api` is specified, allow API clients to trade.
+* `RECONNECTDATA`: send CTRL-ALT-F key sequence to TWS, causing it to restart its connections to streaming data servers.
+* `RECONNECTACCOUNT`: send CTRL-ALT-R key sequence to TWS, causing it to restart its connections to the account server.
+
+Responses:
+
+* `INFO ...`: some informational notice
+* `OK ...`: the last request completed successfully
+* `ERROR ...`: the last request failed
+
 ### Any Questions?
 
 If you need assistance with running IBC, or have any queries or
