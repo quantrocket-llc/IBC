@@ -36,16 +36,17 @@ class CommandDispatcher
     @Override public void run() {
         String cmd = mChannel.getCommand();
         while (cmd != null) {
-            if (cmd.equalsIgnoreCase("EXIT")) {
+            String upper = cmd.toUpperCase();
+            if (upper.equals("EXIT")) {
                 mChannel.writeAck("Goodbye");
                 break;
-            } else if (cmd.equalsIgnoreCase("STOP")) {
+            } else if (cmd.equals("STOP")) {
                 handleStopCommand();
-            } else if (cmd.equalsIgnoreCase("ENABLEAPI")) {
-                handleEnableAPICommand();
-            } else if (cmd.equalsIgnoreCase("RECONNECTDATA")) {
+            } else if (cmd.startsWith("ENABLEAPI")) {
+                handleEnableAPICommand(cmd);
+            } else if (cmd.equals("RECONNECTDATA")) {
             	handleReconnectDataCommand();
-            } else if (cmd.equalsIgnoreCase("RECONNECTACCOUNT")) {
+            } else if (cmd.equals("RECONNECTACCOUNT")) {
             	handleReconnectAccountCommand();
             } else {
                 handleInvalidCommand(cmd);
@@ -61,14 +62,26 @@ class CommandDispatcher
         Utils.logError("CommandServer: invalid command received: " + cmd);
     }
 
-    private void handleEnableAPICommand() {
+    private void handleEnableAPICommand(String cmd) {
         if (isGateway) {
             mChannel.writeNack("ENABLEAPI is not valid for the IB Gateway");
             return;
         }
-        
+
+        String[] words = cmd.split("\\s+");
+        boolean enableRemoteConnections = false;
+        boolean disableReadonlyApi = false;
+
+        for (int i = 1; i < words.length; i++) {
+            if (words[i].equalsIgnoreCase("enable-remote-connections")) {
+                enableRemoteConnections = true;
+            } else if (words[i].equalsIgnoreCase("disable-readonly-api")) {
+                disableReadonlyApi = true;
+            }
+        }
+
         // run on the current thread
-        (new ConfigurationTask(new EnableApiTask(mChannel))).execute();
+        (new ConfigurationTask(new EnableApiTask(mChannel, enableRemoteConnections, disableReadonlyApi))).execute();
    }
 
     private void handleReconnectDataCommand() {
