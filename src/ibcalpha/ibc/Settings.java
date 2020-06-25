@@ -59,6 +59,65 @@ public class Settings {
         load(getSettingsPath(args));
     }
 
+    /**
+     * FIX username - can either be supplied from the .ini file or as args[1]
+     * NB: if username is supplied in args[1], then the password must
+     * be in args[2], and the IBAPI username and password may be in
+     * args[3] and args[4]. If username is supplied in .ini, then the password must
+     * also be in .ini.
+     */
+    private volatile String _fixLoginId = "";
+
+    public String fixLoginId() {
+        return _fixLoginId;
+    }
+
+    public void setFixLoginId(String fixLoginId) {
+        _fixLoginId = fixLoginId;
+    }
+
+    /**
+     * FIX password - can either be supplied from the .ini file or as args[2]
+     */
+    private volatile String _fixPassword = "";
+
+    public String fixPassword() {
+        return _fixPassword;
+    }
+
+    public void setFixPassword(String fixPassword) {
+        _fixPassword = fixPassword;
+    }
+
+    /**
+     * IBAPI username - can either be supplied from the .ini file or as args[1]
+     * NB: if IBAPI username is supplied in args[1], then the password must
+     * be in args[2]. If IBAPI username is supplied in .ini, then the password must
+     * also be in .ini.
+     */
+    private volatile String _ibLoginId = "";
+
+    public String ibLoginId() {
+        return _ibLoginId;
+    }
+
+    public void setIbLoginId(String ibLoginId) {
+        _ibLoginId = ibLoginId;
+    }
+
+    /**
+     * IBAPI password - can either be supplied from the .ini file or as args[2]
+     */
+    private volatile String _ibPassword = "";
+
+    public String ibPassword() {
+        return _ibPassword;
+    }
+
+    public void setIbPassword(String ibPassword) {
+        _ibPassword = ibPassword;
+    }
+
     private void load(String path) {
         this.path = path;
         props.clear();

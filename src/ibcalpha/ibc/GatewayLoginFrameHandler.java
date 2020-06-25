@@ -57,14 +57,14 @@ final class GatewayLoginFrameHandler extends AbstractLoginHandler {
     
     private boolean setMissingFIXCredentials(Window window) {
         boolean result = false;
-        if (LoginManager.loginManager().getFixUsername().length() == 0) {
+        if (Settings.settings().fixLoginId().length() == 0) {
             setMissingCredential(window, 0);
-        } else if (LoginManager.loginManager().getFixPassword().length() == 0) {
+        } else if (Settings.settings().fixPassword().length() == 0) {
             setMissingCredential(window, 1);
-        } else if (LoginManager.loginManager().getApiUsername().length() != 0 || LoginManager.loginManager().getApiPassword().length() != 0) {
-            if (LoginManager.loginManager().getApiUsername().length() == 0) {
+        } else if (Settings.settings().ibLoginId().length() != 0 || Settings.settings().ibPassword().length() != 0) {
+            if (Settings.settings().ibLoginId().length() == 0) {
                 setMissingCredential(window, 3);
-            } else if (LoginManager.loginManager().getApiPassword().length() == 0) {
+            } else if (Settings.settings().ibPassword().length() == 0) {
                 setMissingCredential(window, 4);
             } else {
                 result = true;
@@ -77,9 +77,9 @@ final class GatewayLoginFrameHandler extends AbstractLoginHandler {
 
     private boolean setMissingIBAPICredentials(Window window) {
         boolean result = false;
-        if (LoginManager.loginManager().getApiUsername().length() == 0) {
+        if (Settings.settings().ibLoginId().length() == 0) {
             setMissingCredential(window, 0);
-        } else if (LoginManager.loginManager().getApiPassword().length() == 0) {
+        } else if (Settings.settings().ibPassword().length() == 0) {
             setMissingCredential(window, 1);
         } else {
             result = true;
@@ -90,13 +90,13 @@ final class GatewayLoginFrameHandler extends AbstractLoginHandler {
     @Override
     protected final boolean setFields(Window window, int eventID) throws IbcException {
         if (Settings.settings().getFixEnabled()) {
-            setCredential(window, "FIX user name", 0, LoginManager.loginManager().getFixUsername());
-            setCredential(window, "FIX password", 1, LoginManager.loginManager().getFixPassword());
-            setCredential(window, "IBAPI user name", 2, LoginManager.loginManager().getApiUsername());
-            setCredential(window, "IBAPI password", 3, LoginManager.loginManager().getApiPassword());
+            setCredential(window, "FIX user name", 0, Settings.settings().fixLoginId());
+            setCredential(window, "FIX password", 1, Settings.settings().fixPassword());
+            setCredential(window, "IBAPI user name", 2, Settings.settings().ibLoginId());
+            setCredential(window, "IBAPI password", 3, Settings.settings().ibPassword());
         } else {
-            setCredential(window, "IBAPI user name", 0, LoginManager.loginManager().getApiUsername());
-            setCredential(window, "IBAPI password", 1, LoginManager.loginManager().getApiPassword());
+            setCredential(window, "IBAPI user name", 0, Settings.settings().ibLoginId());
+            setCredential(window, "IBAPI password", 1, Settings.settings().ibPassword());
         }
         return true;
     }

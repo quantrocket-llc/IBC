@@ -28,6 +28,7 @@ public class ArgumentParser {
 
     public void parse(String[] args) {
         _parseTradingMode(args);
+        _parseCredentials(args);
     }
 
     /*
@@ -47,6 +48,53 @@ public class ArgumentParser {
         if (mode != null) {
             Utils.logToConsole("Trading mode set from arguments: " + mode);
             _settings.setTradingMode(TradingMode.fromString(mode));
+        }
+    }
+
+    public void _parseCredentials(String[] args) {
+        if (_settings.getFixEnabled()) {
+            loadApiCredentialsFromArgs(args);
+            loadFixCredentialsFromArgs(args);
+        } else {
+            loadApiCredentialsFromArgs(args);
+        }
+    }
+
+    private boolean loadFixCredentialsFromArgs(String[] args) {
+        if (args.length >= 3 && args.length <= 6) {
+            _settings.setFixLoginId(args[1]);
+            _settings.setFixPassword(args[2]);
+            Utils.logToConsole("FIX credentials set from arguments");
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean loadApiCredentialsFromArgs(String[] args) {
+        if (Settings.settings().getFixEnabled()) {
+            if (args.length == 5 || args.length == 6) {
+                _settings.setIbLoginId(args[3]);
+                _settings.setIbPassword(args[4]);
+                Utils.logToConsole("IB credentials set from arguments");
+                return true;
+            }
+            return false;
+        } else if (args.length == 3 || args.length == 4) {
+            _settings.setIbLoginId(args[1]);
+            _settings.setIbPassword(args[2]);
+            Utils.logToConsole("IB credentials set from arguments");
+            return true;
+        } else if (args.length == 5 || args.length == 6) {
+            Utils.logError("Incorrect number of arguments passed. quitting...");
+            Utils.logRawToConsole("Number of arguments = " +args.length + " which is only permitted if FIX=yes");
+            for (String arg : args) {
+                Utils.logRawToConsole(arg);
+            }
+            Utils.exitWithError(ErrorCodes.ERROR_CODE_INCORRECT_NUMBER_OF_ARGUMENTS);
+            return false;
+        } else {
+            return false;
         }
     }
 }

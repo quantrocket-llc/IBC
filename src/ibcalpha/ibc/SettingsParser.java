@@ -27,15 +27,47 @@ public class SettingsParser {
     }
 
     public void parse() {
-        _setTradingMode();
+        _parseTradingMode();
+        _parseApiCredentials();
+        _parseFixCredentials();
     }
 
-    private void _setTradingMode()
+    private void _parseTradingMode()
     {
         String mode = _settings.getString("TradingMode", "");
         if (mode.length() > 0) {
             Utils.logToConsole("Trading mode set from config: " + mode);
             _settings.setTradingMode(TradingMode.fromString(mode));
+        }
+    }
+
+    private void _parseApiCredentials()
+    {
+        String ibLoginId = _settings.getString("IbLoginId", "");
+        if(ibLoginId.length() > 0) {
+            Utils.logToConsole("IbLoginId set from config: " + ibLoginId);
+            _settings.setIbLoginId(ibLoginId);
+        }
+
+        String ibPassword = _settings.getString("IBPassword", "");
+        if(ibPassword.length() > 0) {
+            Utils.logToConsole("IBPassword set from config: " + ibPassword);
+            _settings.setIbPassword(ibPassword);
+        }
+    }
+
+    private void _parseFixCredentials()
+    {
+        String fixLoginId = _settings.getString("FIXLoginId", "");
+        if(fixLoginId.length() > 0) {
+            Utils.logToConsole("FIXLoginId set from config: " + fixLoginId);
+            _settings.setFixLoginId(fixLoginId);
+        }
+
+        String fixPassword = _settings.getString("FIXPassword", "");
+        if(fixPassword.length() > 0) {
+            Utils.logToConsole("FIXPassword set from config: " + fixPassword);
+            _settings.setFixPassword(fixPassword);
         }
     }
 }

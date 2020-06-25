@@ -219,7 +219,6 @@ public class IbcTws {
     
     static void setupDefaultEnvironment(final String[] args, final boolean isGateway) throws Exception {
         Settings.settings().loadFromArgs(args);
-        LoginManager.loginManager().loadFromArgs(args);
         MainWindowManager.mainWindowManager().setIsGateway(isGateway);
 
         (new SettingsParser(Settings.settings())).parse();
@@ -269,7 +268,6 @@ public class IbcTws {
         printProperties();
         
         Settings.settings().logDiagnosticMessage();
-        LoginManager.loginManager().logDiagnosticMessage();
         MainWindowManager.mainWindowManager().logDiagnosticMessage();
         ConfigDialogManager.configDialogManager().logDiagnosticMessage();
         
