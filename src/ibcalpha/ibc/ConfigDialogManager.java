@@ -18,38 +18,59 @@
 
 package ibcalpha.ibc;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 
-public abstract class ConfigDialogManager
+
+public class ConfigDialogManager
 {
-    private static ConfigDialogManager _ConfigDialogManager;
+    private static ConfigDialogManager _instance;
+
+    private volatile JDialog configDialog = null;
+    private volatile GetConfigDialogTask configDialogTask;
+
+    private final Object futureCreationLock = new Object();
+    private Future<JDialog> configDialogFuture;
+
+    /* records the number of 'things' (including possibly the user) that
+     * are currently accessing the config dialog
+    */
+    private int usageCount;
+
+    private boolean apiConfigChangeConfirmationExpected;
 
     static {
-        _ConfigDialogManager = new DefaultConfigDialogManager();
+        _instance = new ConfigDialogManager();
     }
-    
-    public static void initialise(ConfigDialogManager configDialogManager){
-        if (configDialogManager == null) throw new IllegalArgumentException("configDialogManager");
-        _ConfigDialogManager = configDialogManager;
-    }
-    
-    public static void setDefault() {
-        _ConfigDialogManager = new DefaultConfigDialogManager();
-    }
-    
+
     public static ConfigDialogManager configDialogManager() {
-        return _ConfigDialogManager;
+        return _instance;
     }
-    
-    public abstract void logDiagnosticMessage();
-    
+
+    protected ConfigDialogManager() {
+    }
+
+    public void logDiagnosticMessage() {
+        Utils.logToConsole("using default config dialog manager");
+    }
+
     /**
      * Records the fact that the config dialog has closed.
      */
-    public abstract void clearConfigDialog();
+    public void clearConfigDialog() {
+        configDialog = null;
+    }
 
-    public abstract boolean getApiConfigChangeConfirmationExpected();
+    public boolean getApiConfigChangeConfirmationExpected() {
+        return apiConfigChangeConfirmationExpected;
+    }
 
     /**
      * Returns the Global Configuration dialog, if necessary blocking the calling thread until
@@ -72,7 +93,9 @@ public abstract class ConfigDialogManager
      * @throws IllegalStateException
      * the method has been called from the Swing event dispatch thread
      */
-    public abstract JDialog getConfigDialog(long timeout, TimeUnit unit) throws IllegalStateException;
+    public JDialog getConfigDialog() throws IllegalStateException {
+        return getConfigDialog(-1, TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Returns the Global Configuration dialog, if necessary blocking the calling thread until
@@ -89,16 +112,94 @@ public abstract class ConfigDialogManager
      * @throws IllegalStateException
      * the method has been called from the Swing event dispatch thread
      */
-    public abstract JDialog getConfigDialog() throws IllegalStateException;
+    public JDialog getConfigDialog(long timeout, TimeUnit unit) throws IllegalStateException {
+        /* Note that caching a config dialog doesn't work, since they seem to
+         * be one-time-only. So we have to go via the menu each time this
+         * method is called (if it isn't currently open or being opened).
+        */
 
-    public abstract void releaseConfigDialog();
+        if (SwingUtilities.isEventDispatchThread()) throw new IllegalStateException();
 
-    public abstract void setApiConfigChangeConfirmationExpected();
+        Utils.logToConsole("Getting config dialog");
 
-    public abstract void setApiConfigChangeConfirmationHandled();
+        incrementUsage();
 
-    public abstract void setConfigDialog(JDialog window);
+        if (configDialog != null) {
+            Utils.logToConsole("Config dialog already found");
+            return configDialog;
+        }
 
-    public abstract void setSplashScreenClosed();
-        
+        synchronized(futureCreationLock) {
+            if (configDialogFuture != null) {
+                    Utils.logToConsole("Waiting for config dialog future to complete");
+            } else {
+                Utils.logToConsole("Creating config dialog future");
+                configDialogTask = new GetConfigDialogTask(MainWindowManager.mainWindowManager().isGateway());
+                ExecutorService exec = Executors.newSingleThreadExecutor();
+                configDialogFuture = exec.submit((Callable<JDialog>)configDialogTask);
+                exec.shutdown();
+            }
+        }
+
+        try {
+            if (timeout < 0) {
+                configDialog = configDialogFuture.get();
+            } else {
+                configDialog = configDialogFuture.get(timeout, unit);
+            }
+            Utils.logToConsole("Got config dialog from future");
+            return configDialog;
+        } catch (TimeoutException | InterruptedException e) {
+            return null;
+        } catch (ExecutionException e) {
+            Throwable t = e.getCause();
+            if (t instanceof IbcException) {
+                Utils.logError("getConfigDialog could not find " + t.getMessage());
+                return null;
+            }
+            if (t instanceof RuntimeException) throw (RuntimeException)t;
+            if (t instanceof Error) throw (Error)t;
+            throw new IllegalStateException(t);
+        }
+    }
+
+    public void releaseConfigDialog() {
+        decrementUsage();
+    }
+
+    public void setApiConfigChangeConfirmationExpected() {
+        apiConfigChangeConfirmationExpected = true;
+    }
+
+    public void setApiConfigChangeConfirmationHandled() {
+        apiConfigChangeConfirmationExpected = false;
+    }
+
+    public void setConfigDialog(JDialog window) {
+        configDialog = window;
+        if (configDialogTask == null) {
+            // config dialog opened by user
+            incrementUsage();
+        } else {
+            configDialogTask.setConfigDialog(window);
+            configDialogTask = null;
+            configDialogFuture = null;
+        }
+    }
+
+    public void setSplashScreenClosed() {
+        if (configDialogTask != null) configDialogTask.setSplashScreenClosed();
+    }
+
+    private synchronized void incrementUsage() {
+        usageCount++;
+    }
+
+    private synchronized void decrementUsage() {
+        usageCount--;
+        if (usageCount == 0) {
+            GuiDeferredExecutor.instance().execute(() -> MainWindowManager.mainWindowManager().iconizeIfRequired());
+            SwingUtils.clickButton(configDialog, "OK");
+        }
+    }
 }
