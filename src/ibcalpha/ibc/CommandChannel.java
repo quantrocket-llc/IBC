@@ -27,10 +27,6 @@ import java.net.Socket;
 import java.net.SocketException;
 
 final class CommandChannel {
-
-    private static final String _Prompt = Settings.settings().getString("CommandPrompt", "");
-    private static final boolean _SuppressInfo = Settings.settings().getBoolean("SuppressInfoMessages", true);
-
     private Socket mSocket;
     private BufferedReader mInstream = null;
     private BufferedWriter mOutstream = null;
@@ -92,7 +88,9 @@ final class CommandChannel {
     }
 
     final void writeInfo(String info) {
-        if (! _SuppressInfo) replyLine("INFO " + info);
+        if(! Settings.settings().suppressInfoMessages()) {
+            replyLine("INFO " + info);
+        }
     }
 
     void writeNack(String info) {
@@ -100,7 +98,10 @@ final class CommandChannel {
     }
 
     void writePrompt() {
-        if (! _Prompt.isEmpty()) reply(_Prompt);
+        String prompt = Settings.settings().commandServerPrompt();
+        if (! prompt.isEmpty()) {
+            reply(prompt);
+        }
     }
 
     private void reply(String message) {

@@ -26,36 +26,11 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
-class TwsListener
-        implements AWTEventListener {
-
+class TwsListener implements AWTEventListener {
     private final List<WindowHandler> windowHandlers;
-
-    private final String logComponents;
 
     TwsListener (List<WindowHandler> windowHandlers) {
         this.windowHandlers = windowHandlers;
-
-        String logComponentsSetting =  Settings.settings().getString("LogComponents", "never").toLowerCase();
-        switch (logComponentsSetting) {
-            case "activate":
-            case "open":
-            case "never":
-                logComponents = logComponentsSetting;
-                break;
-            case "yes":
-            case "true":
-                logComponents="open";
-                break;
-            case "no":
-            case "false":
-                logComponents="never";
-                break;
-            default:
-                logComponents="never";
-                Utils.logError("the LogComponents setting is invalid.");
-                break;
-        }
     }
 
     @Override
@@ -92,15 +67,14 @@ class TwsListener
         } else {
             Utils.logToConsole("detected window: type=" + window.getClass().getName() + "; event=" + event);
         }
-        
-        if ((eventID == WindowEvent.WINDOW_OPENED && (logComponents.equals("open") || logComponents.equals("activate")))
+
+        ComponentLogPolicy policy = Settings.settings().componentLogPolicy();
+        if ((eventID == WindowEvent.WINDOW_OPENED && (policy == ComponentLogPolicy.OPEN || policy == ComponentLogPolicy.ACTIVATE))
             ||
-            (eventID == WindowEvent.WINDOW_ACTIVATED && logComponents.equals("activate")))
-        {
+            (eventID == WindowEvent.WINDOW_ACTIVATED && policy == ComponentLogPolicy.ACTIVATE)) {
             Utils.logRawToConsole(SwingUtils.getWindowStructure(window));
         }
     }
-    
 }
 
 

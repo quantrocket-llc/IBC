@@ -46,7 +46,7 @@ class CommandServer
     public void run() {
         Thread.currentThread().setName("CommandServer");
 
-        final int port = Settings.settings().getInt("CommandServerPort", 0);
+        final int port = Settings.settings().commandServerPort();
         if (port == 0) {
             Utils.logToConsole("CommandServer is not started because the port is not configured");
             return;
@@ -78,7 +78,7 @@ class CommandServer
     private boolean createSocket(final int port) {
         final int backlog = 5;
         try {
-            final String bindaddr = Settings.settings().getString("BindAddress", "");
+            String bindaddr = Settings.settings().commandServerBindAddress();
             if (!bindaddr.isEmpty()) {
                 mSocket = new ServerSocket(port,
                                             backlog,
@@ -113,7 +113,7 @@ class CommandServer
         try {
             final Socket socket = mSocket.accept();
 
-            final String allowedAddresses = Settings.settings().getString("ControlFrom", "");
+            final String allowedAddresses = Settings.settings().commandServerControlFrom();
             Utils.logToConsole("CommandServer: ControlFrom setting = " + allowedAddresses);
             
             boolean permitted = false; 

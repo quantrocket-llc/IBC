@@ -22,8 +22,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -31,13 +33,7 @@ public class Settings {
     private final Properties props = new Properties();
     private String path;
 
-    private static Settings _instance;
-
-    private TradingMode _tradingMode = TradingMode.LIVE;
-
-    static {
-        _instance = new Settings();
-    }
+    private static Settings _instance = new Settings();
 
     public static Settings settings() {
         return _instance;
@@ -221,33 +217,14 @@ public class Settings {
         }
     }
 
-    /**
-    returns the double value associated with property named key.
-    Returns defaultVAlue if there is no such property,
-    or if the property value cannot be converted to a double.
-     * @param key
-     * @param defaultValue
-     * @return
-     */
-    public double getDouble(String key, double defaultValue) {
-        String value = props.getProperty(key);
+    private int _commandServerPort = 0;
 
-        // handle key missing or key=[empty string] in .ini file
-        if (value == null || value.length() == 0) {
-            return defaultValue;
-        }
+    public int commandServerPort() {
+        return _commandServerPort;
+    }
 
-        try {
-            return Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            Utils.logToConsole(
-                    "Invalid number \""
-                    + value
-                    + "\" for property \""
-                    + key
-                    + "\"");
-            return defaultValue;
-        }
+    public void setCommandServerPort(int commandServerPort) {
+        _commandServerPort = commandServerPort;
     }
 
     /**
@@ -301,11 +278,156 @@ public class Settings {
     }
 
 
+    private TradingMode _tradingMode = TradingMode.LIVE;
+
     public TradingMode tradingMode() {
         return _tradingMode;
     }
 
     public void setTradingMode(TradingMode tradingMode) {
         _tradingMode = tradingMode;
+    }
+
+
+    private int _overrideTwsApiPort = 0;
+
+    public int overrideTwsApiPort() {
+        return _overrideTwsApiPort;
+    }
+
+    public void setOverrideTwsApiPort(int overrideTwsApiPort) {
+        _overrideTwsApiPort = overrideTwsApiPort;
+    }
+
+
+    private Boolean _storeSettingsOnServer = null;
+
+    public Boolean storeSettingsOnServer() {
+        return _storeSettingsOnServer;
+    }
+
+    public void setStoreSettingsOnServer(boolean storeSettingsOnServer) {
+        _storeSettingsOnServer = Boolean.valueOf(storeSettingsOnServer);
+    }
+
+
+    private String _commandServerPrompt = "";
+
+    public String commandServerPrompt() {
+        return _commandServerPrompt;
+    }
+
+    public void setCommandServerPrompt(String commandServerPrompt) {
+        _commandServerPrompt = commandServerPrompt;
+    }
+
+
+    private boolean _suppressInfoMessages = true;
+
+    public boolean suppressInfoMessages() {
+        return _suppressInfoMessages;
+    }
+
+    public void setSuppressInfoMessages(boolean suppressInfoMessages) {
+        _suppressInfoMessages = suppressInfoMessages;
+    }
+
+
+    private String _commandServerBindAddress = "";
+
+    public String commandServerBindAddress() {
+        return _commandServerBindAddress;
+    }
+
+    public void setCommandServerBindAddress(String bindAddress) {
+        _commandServerBindAddress = bindAddress;
+    }
+
+
+    private String _commandServerControlFrom = "";
+
+    public String commandServerControlFrom() {
+        return _commandServerControlFrom;
+    }
+
+    public void setCommandServerControlFrom(String controlFrom) {
+        _commandServerControlFrom = controlFrom;
+    }
+
+
+    private List<Date> _saveTwsSettingsAt = null;
+
+    public List<Date> saveTwsSettingsAt() {
+        return _saveTwsSettingsAt;
+    }
+
+    public void setSaveTwsSettingsAt(List<Date> dates) {
+        _saveTwsSettingsAt = dates;
+    }
+
+
+    private IncomingConnectionPolicy _incomingConnectionPolicy = IncomingConnectionPolicy.REJECT;
+
+    public IncomingConnectionPolicy incomingConnectionPolicy() {
+        return _incomingConnectionPolicy;
+    }
+
+    public void setIncomingConnectionPolicy(IncomingConnectionPolicy policy) {
+        _incomingConnectionPolicy = policy;
+    }
+
+
+    private ExistingSessionPolicy _existingSessionPolicy = ExistingSessionPolicy.MANUAL;
+
+    public ExistingSessionPolicy existingSessionPolicy() {
+        return _existingSessionPolicy;
+    }
+
+    public void setExistingSessionPolicy(ExistingSessionPolicy policy) {
+        _existingSessionPolicy = policy;
+    }
+
+
+    private ComponentLogPolicy _componentLogPolicy = ComponentLogPolicy.NEVER;
+
+    public ComponentLogPolicy componentLogPolicy() {
+        return _componentLogPolicy;
+    }
+
+    public void setComponentLogPolicy(ComponentLogPolicy policy) {
+        _componentLogPolicy = policy;
+    }
+
+
+    private Date _shutdownTime = null;
+
+    public Date shutdownTime() {
+        return _shutdownTime;
+    }
+
+    public void setShutdownTime(Date shutdownTime) {
+        _shutdownTime = shutdownTime;
+    }
+
+
+    private String _ibDir = System.getProperty("user.dir");
+
+    public String ibDir() {
+        return _ibDir;
+    }
+
+    public void setIbDir(String ibDir) {
+        _ibDir = ibDir;
+    }
+
+
+    private Boolean _readonlyApi = null;
+
+    public Boolean readonlyApi() {
+        return _readonlyApi;
+    }
+
+    public void setReadonlyApi(boolean readonlyApi) {
+        _readonlyApi = Boolean.valueOf(readonlyApi);
     }
 }

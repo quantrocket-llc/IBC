@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -322,60 +321,12 @@ public class IbcTws {
         return windowHandlers;
     }
     
-    private static Date getShutdownTime() {
-        String shutdownTimeSetting = Settings.settings().getString("ClosedownAt", "");
-        if (shutdownTimeSetting.length() == 0) {
-            return null;
-        } else {
-            int shutdownDayOfWeek;
-            int shutdownHour;
-            int shutdownMinute;
-            Calendar cal = Calendar.getInstance();
-            try {
-                boolean dailyShutdown = false;
-                try {
-                    cal.setTime((new SimpleDateFormat("E HH:mm")).parse(shutdownTimeSetting));
-                    dailyShutdown = false;
-                } catch (ParseException e) {
-                    try {
-                        String today = (new SimpleDateFormat("E")).format(cal.getTime());
-                        cal.setTime((new SimpleDateFormat("E HH:mm")).parse(today + " " + shutdownTimeSetting));
-                        dailyShutdown = true;
-                    } catch (ParseException x) {
-                        throw x;
-                    }
-                }
-                shutdownDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-                shutdownHour = cal.get(Calendar.HOUR_OF_DAY);
-                shutdownMinute = cal.get(Calendar.MINUTE);
-                cal.setTimeInMillis(System.currentTimeMillis());
-                cal.set(Calendar.HOUR_OF_DAY, shutdownHour);
-                cal.set(Calendar.MINUTE, shutdownMinute);
-                cal.set(Calendar.SECOND, 0);
-                cal.add(Calendar.DAY_OF_MONTH,
-                        (shutdownDayOfWeek + 7 -
-                         cal.get(Calendar.DAY_OF_WEEK)) % 7);
-                if (!cal.getTime().after(new Date())) {
-                    if (dailyShutdown) {
-                        cal.add(Calendar.DAY_OF_MONTH, 1);
-                    } else {
-                        cal.add(Calendar.DAY_OF_MONTH, 7);
-                    }
-                }
-            } catch (ParseException e) {
-                Utils.exitWithError(ErrorCodes.ERROR_CODE_INVALID_CLOSEDOWN_AT_SETTING, 
-                                    "Invalid ClosedownAt setting: '" + shutdownTimeSetting + "'; format should be: <[day ]hh:mm>   eg 22:00 or Friday 22:00");
-            }
-            return cal.getTime();
-        }
-    }
-
     private static String getJtsIniFilePath() {
         return getTWSSettingsDirectory() + File.separatorChar + "jts.ini";
     }
     
     private static String getTWSSettingsDirectory() {
-        String path = Settings.settings().getString("IbDir", System.getProperty("user.dir"));
+        String path = Settings.settings().ibDir();
         try {
             Files.createDirectories(Paths.get(path));
         } catch (FileAlreadyExistsException ex) {
@@ -416,7 +367,7 @@ public class IbcTws {
     }
 
     private static void startShutdownTimerIfRequired(boolean isGateway) {
-        Date shutdownTime = getShutdownTime();
+        Date shutdownTime = Settings.settings().shutdownTime();
         if (! (shutdownTime == null)) {
             long delay = shutdownTime.getTime() - System.currentTimeMillis();
             Utils.logToConsole((isGateway ? "Gateway" : "TWS") +
@@ -452,11 +403,15 @@ public class IbcTws {
             startTws();
         }
 
-        int portNumber = Settings.settings().getInt("OverrideTwsApiPort", 0);
+        int portNumber = Settings.settings().overrideTwsApiPort();
         if (portNumber != 0) (new ConfigurationTask(new ConfigureTwsApiPortTask(portNumber))).executeAsync();
-        
-        if (!Settings.settings().getString("ReadOnlyApi", "").equals("")) {
-            (new ConfigurationTask(new ConfigureReadOnlyApiTask(Settings.settings().getBoolean("ReadOnlyApi",true)))).executeAsync();
+
+        if (Settings.settings().readonlyApi() != null) {
+            (new ConfigurationTask(
+                new ConfigureReadOnlyApiTask(
+                    Settings.settings().readonlyApi().booleanValue()
+                )
+            )).executeAsync();
         }
 
         Utils.sendConsoleOutputToTwsLog(!Settings.settings().getBoolean("LogToConsole", false));

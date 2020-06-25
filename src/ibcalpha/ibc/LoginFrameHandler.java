@@ -71,20 +71,20 @@ final class LoginFrameHandler extends AbstractLoginHandler {
             }
 
             private void setStoreSettingsOnServerCheckbox() {
-                if (Settings.settings().getString("StoreSettingsOnServer", "").length() != 0) {
+                Boolean store = Settings.settings().storeSettingsOnServer();
+                if(store != null) {
                     final String STORE_SETTINGS_ON_SERVER_CHECKBOX = "Use/store settings on server";
-                    
+
                     // we defer setting the checkbox: if we do it inline, TWS's setting 
                     // overwrites it
                     GuiDeferredExecutor.instance().execute(() -> {
-                        boolean storeSettingsOnServer = Settings.settings().getBoolean("StoreSettingsOnServer", false);
                         if (! SwingUtils.setCheckBoxSelected(
                                 window,
                                 STORE_SETTINGS_ON_SERVER_CHECKBOX,
-                                storeSettingsOnServer)) {
+                                store.booleanValue())) {
                             Utils.exitWithError(ErrorCodes.ERROR_CODE_CANT_FIND_CONTROL, "could not login: could not find control: " + STORE_SETTINGS_ON_SERVER_CHECKBOX);
                         }
-                        Utils.logToConsole("Use/store settings on server selected: " + storeSettingsOnServer);
+                        Utils.logToConsole("Use/store settings on server selected: " + store.booleanValue());
                     });
                 }
             }

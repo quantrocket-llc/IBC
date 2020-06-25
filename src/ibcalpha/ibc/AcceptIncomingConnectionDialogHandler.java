@@ -33,26 +33,26 @@ class AcceptIncomingConnectionDialogHandler implements WindowHandler {
     }
 
     public void handleWindow(Window window, int eventID) {
-        final String Accept = "accept";
-        final String Reject = "reject";
-        final String Manual = "manual";
-        
-        String acceptIncomingConnectionAction = Settings.settings().getString("AcceptIncomingConnectionAction", Manual);
-        
-        if (acceptIncomingConnectionAction.equalsIgnoreCase(Manual)) return;
+        switch (Settings.settings().incomingConnectionPolicy()) {
+            case MANUAL:
+                return;
 
-        if (acceptIncomingConnectionAction.equalsIgnoreCase(Accept)) {
-            if (SwingUtils.clickButton(window, "OK")) {
-            } else if (SwingUtils.clickButton(window, "Yes")) {
-            } else {
-                Utils.logError("could not accept incoming connection because we could not find one of the controls.");
-            }
-        } else if (acceptIncomingConnectionAction.equalsIgnoreCase(Reject)) {
-            if (SwingUtils.clickButton(window, "No")) {
-            } else {
-                Utils.logError("could not accept incoming connection because we could not find one of the controls.");
-            }
-        } else {
+            case ACCEPT:
+                if (SwingUtils.clickButton(window, "OK")) {
+                } else if (SwingUtils.clickButton(window, "Yes")) {
+                } else {
+                    Utils.logError("could not accept incoming connection because we could not find one of the controls.");
+                }
+                return;
+
+            case REJECT:
+                if (SwingUtils.clickButton(window, "No")) {
+                } else {
+                    Utils.logError("could not accept incoming connection because we could not find one of the controls.");
+                }
+                return;
+
+            default:
                 Utils.logError("could not accept incoming connection because the AcceptIncomingConnectionAction setting is invalid.");
         }
     }

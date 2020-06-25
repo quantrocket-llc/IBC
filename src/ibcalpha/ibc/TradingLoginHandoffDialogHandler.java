@@ -63,22 +63,30 @@ public class TradingLoginHandoffDialogHandler implements WindowHandler {
         final String INFO_MESSAGE = MESSAGE_STUB + "{}";
         final String ERROR_MESSAGE = MESSAGE_STUB + "error: {}";
         final String COULD_NOT_HANDLE_MESSAGE = MESSAGE_STUB + "could not handle because {}";
-        
-        String setting = Settings.settings().getString("ExistingSessionDetectedAction", "manual");
-        if (setting.equalsIgnoreCase("primary")) {
-            Utils.logToConsole(String.format(INFO_MESSAGE, "end the other session and continue this one"));
-            if (!SwingUtils.clickButton(window, "Disconnect Other Session"))  {
-                Utils.logError(String.format(COULD_NOT_HANDLE_MESSAGE, "the 'Disconnect Other Session' button wasn't found."));
-            }
-        } else if (setting.equalsIgnoreCase("primaryoverride")) {
-            Utils.exitWithError(ErrorCodes.ERROR_CODE_INVALID_STATE, String.format(ERROR_MESSAGE, "ExistingSessionDetectedAction=primaryoverride"));
-        } else if (setting.equalsIgnoreCase("secondary")) {
-            Utils.exitWithError(ErrorCodes.ERROR_CODE_INVALID_STATE, String.format(ERROR_MESSAGE, "ExistingSessionDetectedAction=secondary"));
-        } else if (setting.equalsIgnoreCase("manual")) {
-            Utils.logToConsole(String.format(INFO_MESSAGE, "user must choose whether to continue with this session"));
-            // nothing to do
-        } else {
-            Utils.logError(String.format(COULD_NOT_HANDLE_MESSAGE, "the 'ExistingSessionDetectedAction' setting is invalid."));
+
+        switch (Settings.settings().existingSessionPolicy()) {
+            case PRIMARY:
+                Utils.logToConsole(String.format(INFO_MESSAGE, "end the other session and continue this one"));
+                if (!SwingUtils.clickButton(window, "Disconnect Other Session"))  {
+                    Utils.logError(String.format(COULD_NOT_HANDLE_MESSAGE, "the 'Disconnect Other Session' button wasn't found."));
+                }
+                return;
+
+            case PRIMARY_OVERRIDE:
+                Utils.exitWithError(ErrorCodes.ERROR_CODE_INVALID_STATE, String.format(ERROR_MESSAGE, "ExistingSessionDetectedAction=primaryoverride"));
+                return;
+
+            case SECONDARY:
+                Utils.exitWithError(ErrorCodes.ERROR_CODE_INVALID_STATE, String.format(ERROR_MESSAGE, "ExistingSessionDetectedAction=secondary"));
+                return;
+
+            case MANUAL:
+                Utils.logToConsole(String.format(INFO_MESSAGE, "user must choose whether to continue with this session"));
+                return;
+                // nothing to do
+
+            default:
+                Utils.logError(String.format(COULD_NOT_HANDLE_MESSAGE, "the 'ExistingSessionDetectedAction' setting is invalid."));
         }
     }
 
