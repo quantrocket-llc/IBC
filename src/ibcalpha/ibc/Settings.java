@@ -33,6 +33,8 @@ public class Settings {
 
     private static Settings _instance;
 
+    private TradingMode _tradingMode = TradingMode.LIVE;
+
     static {
         _instance = new Settings();
     }
@@ -237,5 +239,14 @@ public class Settings {
 
     public boolean getFixEnabled() {
         return settings().getBoolean("FIX", false);
+    }
+
+
+    public TradingMode tradingMode() {
+        return _tradingMode;
+    }
+
+    public void setTradingMode(TradingMode tradingMode) {
+        _tradingMode = tradingMode;
     }
 }

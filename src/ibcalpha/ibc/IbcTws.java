@@ -221,7 +221,9 @@ public class IbcTws {
         Settings.settings().loadFromArgs(args);
         LoginManager.loginManager().loadFromArgs(args);
         MainWindowManager.mainWindowManager().setIsGateway(isGateway);
-        TradingModeManager.tradingModeManager().loadFromArgs(args);
+
+        (new SettingsParser(Settings.settings())).parse();
+        (new ArgumentParser(Settings.settings())).parse(args);
     }
 
     static void checkArguments(String[] args) {
@@ -269,7 +271,6 @@ public class IbcTws {
         Settings.settings().logDiagnosticMessage();
         LoginManager.loginManager().logDiagnosticMessage();
         MainWindowManager.mainWindowManager().logDiagnosticMessage();
-        TradingModeManager.tradingModeManager().logDiagnosticMessage();
         ConfigDialogManager.configDialogManager().logDiagnosticMessage();
         
         boolean isGateway = MainWindowManager.mainWindowManager().isGateway();

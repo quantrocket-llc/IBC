@@ -86,13 +86,13 @@ public abstract class AbstractLoginHandler implements WindowHandler {
     }
     
     protected final void setTradingMode(final Window window) {
-        String tradingMode = TradingModeManager.tradingModeManager().getTradingMode();
+        TradingMode tradingMode = Settings.settings().tradingMode();
 
         if (SwingUtils.findToggleButton(window, "Live Trading") != null && 
                 SwingUtils.findToggleButton(window, "Paper Trading") != null) {
             // TWS 974 onwards uses toggle buttons rather than a combo box
-            Utils.logToConsole("Setting Trading mode = " + tradingMode);
-            if (tradingMode.equalsIgnoreCase(TradingModeManager.TRADING_MODE_LIVE)) {
+            Utils.logToConsole("Setting Trading mode = " + tradingMode.toString());
+            if (tradingMode == TradingMode.LIVE) {
                 SwingUtils.findToggleButton(window, "Live Trading").doClick();
             } else {
                 SwingUtils.findToggleButton(window, "Paper Trading").doClick();
@@ -107,7 +107,7 @@ public abstract class AbstractLoginHandler implements WindowHandler {
 
             if (tradingModeCombo != null ) {
                 Utils.logToConsole("Setting Trading mode = " + tradingMode);
-                if (tradingMode.equalsIgnoreCase(TradingModeManager.TRADING_MODE_LIVE)) {
+                if (tradingMode == TradingMode.LIVE) {
                     tradingModeCombo.setSelectedItem("Live Trading");
                 } else {
                     tradingModeCombo.setSelectedItem("Paper Trading");
