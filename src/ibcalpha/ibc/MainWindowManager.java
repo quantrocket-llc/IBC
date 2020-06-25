@@ -18,32 +18,51 @@
 
 package ibcalpha.ibc;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
+import java.awt.Frame;
+import java.util.Calendar;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
-public abstract class MainWindowManager {
 
-    private static MainWindowManager _mainWindowManager;
+public class MainWindowManager {
+
+    private static MainWindowManager _instance;
+
+    private volatile JFrame mainWindow = null;
+    private volatile boolean loginCompleted;
+    private volatile GetMainWindowTask mainWindowTask;
+    private final Object futureCreationLock = new Object();
+    private Future<JFrame> mainWindowFuture;
+    private boolean isGateway = false;
+    private String message;
+    private Long lastMinimizeTime;
 
     static {
-        _mainWindowManager = new DefaultMainWindowManager();
+        _instance = new MainWindowManager();
     }
-    
-    public static void initialise(MainWindowManager mainWindowManager){
+
+    public static void initialise(MainWindowManager mainWindowManager) {
         if (mainWindowManager == null) throw new IllegalArgumentException("mainWindowManager");
-        _mainWindowManager = mainWindowManager;
+        _instance = mainWindowManager;
     }
-    
-    public static void setDefault() {
-        _mainWindowManager = new DefaultMainWindowManager();
-    }
-    
+
     public static MainWindowManager mainWindowManager() {
-        return _mainWindowManager;
+        return _instance;
     }
-    
-    public abstract void logDiagnosticMessage();
-    
+
+    public void logDiagnosticMessage() {
+        Utils.logToConsole("using default main window manager: " + message);
+    }
+
 
     /**
      * Returns the main window, if necessary blocking the calling thread until
@@ -66,7 +85,45 @@ public abstract class MainWindowManager {
      * @throws IllegalStateException
      * the method has been called from the Swing event dispatch thread
      */
-    public abstract JFrame getMainWindow(long timeout, TimeUnit unit);
+    public JFrame getMainWindow(long timeout, TimeUnit unit) {
+        if (SwingUtilities.isEventDispatchThread()) throw new IllegalStateException();
+
+        Utils.logToConsole("Getting main window");
+
+        if (mainWindow != null) {
+            Utils.logToConsole("Main window already found");
+            return mainWindow;
+        }
+
+        synchronized(futureCreationLock) {
+            if (mainWindowFuture != null) {
+                    Utils.logToConsole("Waiting for main window future to complete");
+            } else {
+                Utils.logToConsole("Creating main window future");
+                mainWindowTask = new GetMainWindowTask();
+                ExecutorService exec = Executors.newSingleThreadExecutor();
+                mainWindowFuture = exec.submit((Callable<JFrame>) mainWindowTask);
+                exec.shutdown();
+            }
+        }
+
+        try {
+            if (timeout < 0) {
+                mainWindow = mainWindowFuture.get();
+            } else {
+                mainWindow = mainWindowFuture.get(timeout, unit);
+            }
+            Utils.logToConsole("Got main window from future");
+            return mainWindow;
+        } catch (TimeoutException | InterruptedException e) {
+            return null;
+        } catch (ExecutionException e) {
+            Throwable t = e.getCause();
+            if (t instanceof RuntimeException) throw (RuntimeException)t;
+            if (t instanceof Error) throw (Error)t;
+            throw new IllegalStateException(t);
+        }
+    }
 
     /**
      * Returns the main window, if necessary blocking the calling thread until
@@ -83,16 +140,62 @@ public abstract class MainWindowManager {
      * @throws IllegalStateException
      * the method has been called from the Swing event dispatch thread
      */
-    public abstract JFrame getMainWindow() throws IllegalStateException;
-    
-    public abstract boolean isGateway();
-    
-    public abstract boolean isLoginComplete();
+    public JFrame getMainWindow() throws IllegalStateException{
+        return getMainWindow(-1, TimeUnit.MILLISECONDS);
+    }
 
-    public abstract void setLoginComplete();
+    public boolean isGateway() {
+        return this.isGateway;
+    };
 
-    public abstract void setMainWindow(JFrame window);
-    
-    public abstract void iconizeIfRequired();
-    
+    public void setIsGateway(boolean isGateway) {
+        this.isGateway = isGateway;
+    };
+
+    public boolean isLoginComplete() {
+        return loginCompleted;
+    }
+
+    public void setLoginComplete() {
+        Utils.logToConsole("Login completed");
+        loginCompleted = true;
+    }
+
+    private final WindowStateListener listener = new WindowStateListener() {
+        @Override
+        public void windowStateChanged(WindowEvent e) {
+            int state = e.getNewState();
+            if (((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH)) {
+                if ((Calendar.getInstance().getTimeInMillis() - lastMinimizeTime) < 2000) {
+                    iconizeIfRequired();
+                } else {
+                    mainWindow.removeWindowStateListener(listener);
+                }
+            }
+        }
+    };
+
+    public void setMainWindow(JFrame window) {
+        Utils.logToConsole("Found " + (isGateway ? "Gateway" : "TWS") + " main window");
+        mainWindow = window;
+
+        // For TWS, the main window being opened indicates that login is complete. This is not the case
+        // for the Gateway, because the main window is created right at the start, but the splash frame
+        // being closed indicates that login is complete (see the SplahFrameHandler).
+        if (! isGateway) setLoginComplete();
+
+        if (mainWindowTask != null) mainWindowTask.setMainWindow(window);
+        mainWindowTask = null;
+        mainWindowFuture = null;
+
+        iconizeIfRequired();
+
+        mainWindow.addWindowStateListener(listener);
+    }
+
+    public void iconizeIfRequired() {
+        Utils.logToConsole("Minimizing main window");
+        if (Settings.settings().getBoolean("MinimizeMainWindow", false)) mainWindow.setExtendedState(java.awt.Frame.ICONIFIED);
+        lastMinimizeTime = Calendar.getInstance().getTimeInMillis();
+    }
 }
