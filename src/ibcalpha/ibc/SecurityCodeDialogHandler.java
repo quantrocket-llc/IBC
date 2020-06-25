@@ -36,6 +36,8 @@ public class SecurityCodeDialogHandler implements WindowHandler {
 
     @Override
     public void handleWindow(Window window, int eventID) {
+        SecurityCodeDialogManager.getInstance().setDialog(window);
+
         if (! Settings.settings().getBoolean("ReadOnlyLogin", false)) return;
 
         if (SwingUtils.clickButton(window, "Enter Read Only")) {

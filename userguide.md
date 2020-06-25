@@ -735,6 +735,7 @@ Valid requests:
 * `ENABLEAPI [enable-remote-connections] [disable-readonly-api]`: Enable the TWS API in TWS settings. If `enable-remote-connections` is specified, disable requirement for API connections to come from `localhost`. If `disable-readonly-api` is specified, allow API clients to trade.
 * `RECONNECTDATA`: send CTRL-ALT-F key sequence to TWS, causing it to restart its connections to streaming data servers.
 * `RECONNECTACCOUNT`: send CTRL-ALT-R key sequence to TWS, causing it to restart its connections to the account server.
+* `SECURITYCODE <code>`: enter the two-factor authentication security code, if the dialog is visible.
 
 Responses:
 

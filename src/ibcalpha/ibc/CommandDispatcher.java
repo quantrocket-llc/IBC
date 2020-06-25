@@ -19,8 +19,11 @@
 package ibcalpha.ibc;
 
 import java.awt.event.KeyEvent;
+import java.awt.Window;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
+import javax.swing.JTextField;
+
 
 class CommandDispatcher
         implements Runnable {
@@ -44,6 +47,8 @@ class CommandDispatcher
                 handleStopCommand();
             } else if (upper.startsWith("ENABLEAPI")) {
                 handleEnableAPICommand(cmd);
+            } else if (upper.startsWith("SECURITYCODE")) {
+                handleEnterCodeCommand(cmd);
             } else if (upper.equals("RECONNECTDATA")) {
             	handleReconnectDataCommand();
             } else if (upper.equals("RECONNECTACCOUNT")) {
@@ -83,6 +88,43 @@ class CommandDispatcher
         // run on the current thread
         (new ConfigurationTask(new EnableApiTask(mChannel, enableRemoteConnections, disableReadonlyApi))).execute();
    }
+
+    private void handleEnterCodeCommand(String cmd) {
+        String[] words = cmd.split("\\s+");
+        if (words.length != 2) {
+            mChannel.writeNack("ENTERCODE requires one argument");
+            return;
+        }
+
+        String securityCode = words[1];
+
+        Window dialog = SecurityCodeDialogManager.getInstance().getDialog();
+        if (dialog == null) {
+            mChannel.writeNack("security code dialog was not presented");
+            return;
+        }
+
+        if (! dialog.isShowing()) {
+            mChannel.writeNack("security code dialog is not visible");
+            return;
+        }
+
+        final JTextField code = SwingUtils.findTextField(dialog, 0);
+        if (code == null) {
+            mChannel.writeNack("cannot locate text input");
+            return;
+        }
+
+        if (! SwingUtils.setTextField(dialog, 0, securityCode)) {
+            mChannel.writeNack("could not set field value");
+            return;
+        }
+
+        mChannel.writeAck("OK");
+        GuiDeferredExecutor.instance().execute(() -> {
+            SwingUtils.clickButton(dialog, "OK");
+        });
+    }
 
     private void handleReconnectDataCommand() {
         JFrame jf = MainWindowManager.mainWindowManager().getMainWindow(1, TimeUnit.MILLISECONDS);
