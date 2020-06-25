@@ -219,7 +219,7 @@ public class IbcTws {
     
     static void setupDefaultEnvironment(final String[] args, final boolean isGateway) throws Exception {
         Settings.settings().loadFromArgs(args);
-        LoginManager.initialise(new DefaultLoginManager(args));
+        LoginManager.loginManager().loadFromArgs(args);
         MainWindowManager.initialise(new DefaultMainWindowManager(isGateway));
         TradingModeManager.initialise(new DefaultTradingModeManager(args));
     }

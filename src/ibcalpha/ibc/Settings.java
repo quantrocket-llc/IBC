@@ -234,4 +234,8 @@ public class Settings {
         }
         return value;
     }
+
+    public boolean getFixEnabled() {
+        return settings().getBoolean("FIX", false);
+    }
 }

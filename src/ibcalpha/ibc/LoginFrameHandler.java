@@ -95,9 +95,9 @@ final class LoginFrameHandler extends AbstractLoginHandler {
     
     @Override
     protected final boolean preLogin(final Window window, int eventID) throws IbcException {
-        if (LoginManager.loginManager().IBAPIUserName().length() == 0) {
+        if (LoginManager.loginManager().getApiUsername().length() == 0) {
             setMissingCredential(window, 0);
-        } else if (LoginManager.loginManager().IBAPIPassword().length() == 0) {
+        } else if (LoginManager.loginManager().getApiPassword().length() == 0) {
             setMissingCredential(window, 1);
         } else {
             return true;
@@ -108,9 +108,9 @@ final class LoginFrameHandler extends AbstractLoginHandler {
     @Override
     protected final boolean setFields(Window window, int eventID) throws IbcException {
         Utils.logToConsole("Setting user name");
-        setCredential(window, "IBAPI user name", 0, LoginManager.loginManager().IBAPIUserName());
+        setCredential(window, "IBAPI user name", 0, LoginManager.loginManager().getApiUsername());
         Utils.logToConsole("Setting password");
-        setCredential(window, "IBAPI password", 1, LoginManager.loginManager().IBAPIPassword());
+        setCredential(window, "IBAPI password", 1, LoginManager.loginManager().getApiPassword());
         return true;
     }
     
