@@ -18,32 +18,76 @@
 
 package ibcalpha.ibc;
 
-public abstract class TradingModeManager {
-    private static TradingModeManager _TradingModeManager;
 
-    static {
-        _TradingModeManager = new DefaultTradingModeManager();
-    }
-    
-    public static void initialise(TradingModeManager tradingModeManager){
-        if (tradingModeManager == null) throw new IllegalArgumentException("tradingModeManager");
-        _TradingModeManager = tradingModeManager;
-    }
-    
-    public static void setDefault() {
-        _TradingModeManager = new DefaultTradingModeManager();
-    }
-    
-    public static TradingModeManager tradingModeManager() {
-        return _TradingModeManager;
-    }
-    
-    public abstract void logDiagnosticMessage();
-    
+public class TradingModeManager {
+    private static TradingModeManager _instance;
 
     public static final String TRADING_MODE_LIVE = "live";
     public static final String TRADING_MODE_PAPER = "paper";
-    
-    public abstract String getTradingMode();
-    
+
+    private String tradingMode;
+    private String message;
+    private boolean fromSettings;
+
+    static {
+        _instance = new TradingModeManager();
+    }
+
+    public static void initialise(TradingModeManager tradingModeManager) {
+        if (tradingModeManager == null) throw new IllegalArgumentException("tradingModeManager");
+        _instance = tradingModeManager;
+    }
+
+    public static TradingModeManager tradingModeManager() {
+        return _instance;
+    }
+
+    protected TradingModeManager() {
+        fromSettings = false;
+        setTradingMode(TRADING_MODE_LIVE);
+        message = "parameterless constructor (trading mode live assumed)";
+    }
+
+    /*
+     * Must be in either args[1] (if there are two args), or args[3] (if there are
+     * four args), or args[5] (if there are six args)
+    */
+    public void loadFromArgs(String[] args) {
+        if (args.length == 0) {
+            setTradingMode(TRADING_MODE_LIVE);
+        } else if (args.length == 2) {
+            setTradingMode(args[1]);
+        } else if (args.length == 4) {
+            setTradingMode(args[3]);
+        } else if (args.length == 6) {
+            setTradingMode(args[5]);
+        }
+
+        if (tradingMode != null) {
+            fromSettings = false;
+            message = "constructor parameter args: tradingMode=" + tradingMode;
+        } else {
+            fromSettings = true;
+            message = "constructor parameter args but trading mode not present - will be taken from settings";
+        }
+    }
+
+    public String getTradingMode() {
+        if (fromSettings) {
+            setTradingMode( Settings.settings().getString("TradingMode", TRADING_MODE_LIVE));
+            Utils.logToConsole("trading mode from settings: tradingMode=" + tradingMode);
+        }
+        return tradingMode;
+    }
+
+    private void setTradingMode(String value) {
+        if (!(value.equalsIgnoreCase(TRADING_MODE_LIVE) || value.equalsIgnoreCase(TRADING_MODE_PAPER))) {
+                Utils.exitWithError(ErrorCodes.ERROR_CODE_INVALID_TRADING_MODE, "Invalid Trading Mode argument or .ini file setting: " + tradingMode);
+        }
+        tradingMode = value;
+    }
+
+    public void logDiagnosticMessage() {
+        Utils.logToConsole("using default trading mode manager: " + message);
+    }
 }

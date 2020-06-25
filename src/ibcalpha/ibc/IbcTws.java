@@ -221,7 +221,7 @@ public class IbcTws {
         Settings.settings().loadFromArgs(args);
         LoginManager.loginManager().loadFromArgs(args);
         MainWindowManager.mainWindowManager().setIsGateway(isGateway);
-        TradingModeManager.initialise(new DefaultTradingModeManager(args));
+        TradingModeManager.tradingModeManager().loadFromArgs(args);
     }
 
     static void checkArguments(String[] args) {
