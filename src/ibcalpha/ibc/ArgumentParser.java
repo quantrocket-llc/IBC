@@ -18,83 +18,153 @@
 
 package ibcalpha.ibc;
 
+import java.io.File;
 
+
+/**
+ * Allowable parameter combinations:
+ * 
+ * 1. No parameters
+ * 
+ * 2. <iniFile> [<tradingMode>]
+ * 
+ * 3. <iniFile> <apiUserName> <apiPassword> [<tradingMode>]
+ * 
+ * 4. <iniFile> <fixUserName> <fixPassword> <apiUserName> <apiPassword> [<tradingMode>]
+ * 
+ * where:
+ * 
+ *      <iniFile>       ::= NULL | path-and-filename-of-.ini-file 
+ * 
+ *      <tradingMode>   ::= blank | LIVETRADING | PAPERTRADING
+ * 
+ *      <apiUserName>   ::= blank | username-for-TWS
+ * 
+ *      <apiPassword>   ::= blank | password-for-TWS
+ * 
+ *      <fixUserName>   ::= blank | username-for-FIX-CTCI-Gateway
+ * 
+ *      <fixPassword>   ::= blank | password-for-FIX-CTCI-Gateway
+ * 
+ */
 public class ArgumentParser {
     private Settings _settings;
+    private String _settingsPath = null;
 
     public ArgumentParser(Settings settings) {
         _settings = settings;
     }
 
     public void parse(String[] args) {
-        _parseTradingMode(args);
-        _parseCredentials(args);
-    }
-
-    /*
-     * Must be in either args[1] (if there are two args), or args[3] (if there are
-     * four args), or args[5] (if there are six args)
-    */
-    private void _parseTradingMode(String[] args) {
-        String mode = null;
-        if (args.length == 2) {
-            mode = args[1];
+        if (args.length == 0) {
+            _setDefaultSettingsPath();
+        } else if (args.length == 1) {
+            _setSettingsPath(args[0]);
+        } else if (args.length == 3) {
+            _setSettingsPath(args[0]);
+            _setApiCredentials(args[1], args[2]);
         } else if (args.length == 4) {
-            mode = args[3];
+            _setSettingsPath(args[0]);
+            _setApiCredentials(args[1], args[2]);
+            _setTradingMode(args[3]);
         } else if (args.length == 6) {
-            mode = args[5];
-        }
-
-        if (mode != null) {
-            Utils.logToConsole("Trading mode set from arguments: " + mode);
-            _settings.setTradingMode(TradingMode.fromString(mode));
-        }
-    }
-
-    public void _parseCredentials(String[] args) {
-        if (_settings.getFixEnabled()) {
-            loadApiCredentialsFromArgs(args);
-            loadFixCredentialsFromArgs(args);
+            _setSettingsPath(args[0]);
+            _setFixCredentials(args[1], args[2]);
+            _setApiCredentials(args[3], args[4]);
+            _setTradingMode(args[5]);
         } else {
-            loadApiCredentialsFromArgs(args);
-        }
-    }
-
-    private boolean loadFixCredentialsFromArgs(String[] args) {
-        if (args.length >= 3 && args.length <= 6) {
-            _settings.setFixLoginId(args[1]);
-            _settings.setFixPassword(args[2]);
-            Utils.logToConsole("FIX credentials set from arguments");
-            return true;
-        }
-
-        return false;
-    }
-
-    private boolean loadApiCredentialsFromArgs(String[] args) {
-        if (Settings.settings().getFixEnabled()) {
-            if (args.length == 5 || args.length == 6) {
-                _settings.setIbLoginId(args[3]);
-                _settings.setIbPassword(args[4]);
-                Utils.logToConsole("IB credentials set from arguments");
-                return true;
-            }
-            return false;
-        } else if (args.length == 3 || args.length == 4) {
-            _settings.setIbLoginId(args[1]);
-            _settings.setIbPassword(args[2]);
-            Utils.logToConsole("IB credentials set from arguments");
-            return true;
-        } else if (args.length == 5 || args.length == 6) {
-            Utils.logError("Incorrect number of arguments passed. quitting...");
-            Utils.logRawToConsole("Number of arguments = " +args.length + " which is only permitted if FIX=yes");
+            Utils.logError("Incorrect number of arguments passed.");
+            Utils.logRawToConsole("Number of arguments = " + args.length);
             for (String arg : args) {
                 Utils.logRawToConsole(arg);
             }
+
             Utils.exitWithError(ErrorCodes.ERROR_CODE_INCORRECT_NUMBER_OF_ARGUMENTS);
-            return false;
+        }
+    }
+
+    private void _setApiCredentials(String loginId, String password) {
+        if (! loginId.isEmpty()) {
+            Utils.logToConsole("IB username set from arguments: " + loginId);
+            _settings.setIbLoginId(loginId);
+        }
+        if (! password.isEmpty()) {
+            Utils.logToConsole("IB password set from arguments");
+            _settings.setIbPassword(password);
+        }
+    }
+
+    private void _setFixCredentials(String loginId, String password) {
+        if (! loginId.isEmpty()) {
+            Utils.logToConsole("FIX username set from arguments: " + loginId);
+            _settings.setFixLoginId(loginId);
+        }
+        if (! password.isEmpty()) {
+            Utils.logToConsole("FIX password set from arguments");
+            _settings.setFixPassword(password);
+        }
+    }
+
+    private void _setTradingMode(String mode) {
+        Utils.logToConsole("Trading mode set from arguments: " + mode);
+        _settings.setTradingMode(TradingMode.fromString(mode));
+    }
+
+    static String _makeDefaultSettingsPath() {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            return (
+                System.getenv("HOMEDRIVE") +
+                System.getenv("HOMEPATH") +
+                File.separator +
+                "Documents" + File.separator +
+                "IBC" + File.separator +
+                "config.ini"
+            );
         } else {
-            return false;
+            return (
+                System.getProperty("user.home") + File.separator +
+                "IBC" + File.separator +
+                "config.ini"
+            );
+        }
+    }
+
+    private static String _getUsername() {
+        StringBuilder sb = new StringBuilder(System.getProperty("user.name"));
+
+        for (int i = 0; i < sb.length(); i++) {
+            char c = sb.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+                continue;
+            }
+            if (c >= 'A' && c <= 'Z') {
+                sb.setCharAt(i, Character.toLowerCase(c));
+            } else {
+                sb.setCharAt(i, '_');
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public String settingsPath() {
+        return _settingsPath;
+    }
+
+    private void _setDefaultSettingsPath() {
+        _settingsPath = (
+            System.getProperty("user.dir") + File.separator +
+            "config." + _getUsername() + ".ini"
+        );
+    }
+
+    private void _setSettingsPath(String path) {
+        if (path.equalsIgnoreCase("NULL")) {
+            _setDefaultSettingsPath();
+        } else if (path.length() == 0) {
+            _settingsPath = _makeDefaultSettingsPath();
+        } else { // args.length >= 1
+            _settingsPath = path;
         }
     }
 }

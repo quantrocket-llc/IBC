@@ -18,41 +18,18 @@
 
 package ibcalpha.ibc;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 
 public class Settings {
-    private final Properties props = new Properties();
-    private String path;
-
     private static Settings _instance = new Settings();
 
     public static Settings settings() {
         return _instance;
     }
 
-    public void logDiagnosticMessage(){
-        Utils.logToConsole("using default settings provider: ini file is " + path);
-    }
-
     protected Settings() {
-        load(generateDefaultIniPath());
-    }
-
-    protected Settings(String path) {
-        load(path);
-    }
-
-    public void loadFromArgs(String[] args) {
-        load(getSettingsPath(args));
     }
 
     /**
@@ -114,108 +91,6 @@ public class Settings {
         _ibPassword = ibPassword;
     }
 
-    private void load(String path) {
-        this.path = path;
-        props.clear();
-
-        try {
-            File f = new File(path);
-            InputStream is = new BufferedInputStream(new FileInputStream(f));
-            props.load(is);
-            is.close();
-        } catch (FileNotFoundException e) {
-            Utils.logToConsole("Properties file " + path + " not found");
-        } catch (IOException e) {
-            Utils.logToConsole(
-                    "Exception accessing Properties file " + path);
-            Utils.logToConsole(e.toString());
-        }
-    }
-
-    static String generateDefaultIniPath() {
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            return System.getenv("HOMEDRIVE") +
-                    System.getenv("HOMEPATH") + File.separator +
-                    "Documents" + File.separator +
-                    "IBC" + File.separator +
-                    "config.ini";
-        } else {
-            return System.getProperty("user.home") + File.separator +
-                    "IBC" + File.separator +
-                    "config.ini";
-        }
-    }
-
-    static String getSettingsPath(String[] args) {
-        String iniPath;
-        if (args.length == 0 || args[0].equalsIgnoreCase("NULL")) {
-            iniPath = getWorkingDirectory() + "config." + getComputerUserName() + ".ini";
-        } else if (args[0].length() == 0) {
-            iniPath = generateDefaultIniPath();
-        } else {// args.length >= 1
-            iniPath = args[0];
-        }
-
-        File finiPath = new File(iniPath);
-        if (!finiPath.isFile() || !finiPath.exists()) {
-            Utils.exitWithError(
-                ErrorCodes.ERROR_CODE_INI_FILE_NOT_EXIST,
-                "ini file \"" + iniPath +
-                "\" either does not exist, or is a directory.  quitting..."
-            );
-        }
-        return iniPath;
-    }
-
-    private static String getComputerUserName() {
-        StringBuilder sb = new StringBuilder(System.getProperty("user.name"));
-        int i;
-        for (i = 0; i < sb.length(); i++) {
-            char c = sb.charAt(i);
-            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
-                continue;
-            }
-            if (c >= 'A' && c <= 'Z') {
-                sb.setCharAt(i, Character.toLowerCase(c));
-            } else {
-                sb.setCharAt(i, '_');
-            }
-        }
-        return sb.toString();
-    }
-
-    private static String getWorkingDirectory() {
-        return System.getProperty("user.dir") + File.separator;
-    }
-
-    /**
-    returns the boolean value associated with property named key.
-    Returns defaultValue if there is no such property,
-    or if the property value cannot be converted to a boolean.
-     * @param key
-     * @param defaultValue
-     * @return
-     */
-    public boolean getBoolean(String key, boolean defaultValue) {
-        String value = props.getProperty(key);
-
-        // handle key missing or key=[empty string] in .ini file
-        if (value == null || value.length() == 0) {
-            return defaultValue;
-        }
-
-        if (value.equalsIgnoreCase("true")) {
-            return true;
-        } else if (value.equalsIgnoreCase("yes")) {
-            return true;
-        } else if (value.equalsIgnoreCase("false")) {
-            return false;
-        } else if (value.equalsIgnoreCase("no")) {
-            return false;
-        } else {
-            return defaultValue;
-        }
-    }
 
     private int _commandServerPort = 0;
 
@@ -227,54 +102,15 @@ public class Settings {
         _commandServerPort = commandServerPort;
     }
 
-    /**
-    returns the int value associated with property named key.
-    Returns defaultValue if there is no such property,
-    or if the property value cannot be converted to an int.
-     * @param key
-     * @param defaultValue
-     * @return
-     */
-    public int getInt(String key, int defaultValue) {
-        String value = props.getProperty(key);
 
-        // handle key missing or key=[empty string] in .ini file
-        if (value == null || value.length() == 0) {
-            return defaultValue;
-        }
+    private boolean _fixEnabled = false;
 
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            Utils.logToConsole(
-                "Invalid number \""
-                + value
-                + "\" for property \""
-                + key
-                + "\"");
-            return defaultValue;
-        }
+    public boolean fixEnabled() {
+        return _fixEnabled;
     }
 
-    /**
-    returns the value associated with property named key.
-    Returns defaultValue if no such property.
-     * @param key
-     * @param defaultValue
-     * @return
-     */
-    public String getString(String key, String defaultValue) {
-        String value = props.getProperty(key, defaultValue);
-
-        // handle key=[empty string] in .ini file
-        if (value.isEmpty()) {
-            value = defaultValue;
-        }
-        return value;
-    }
-
-    public boolean getFixEnabled() {
-        return settings().getBoolean("FIX", false);
+    public void setFixEnabled(boolean fixEnabled) {
+        _fixEnabled = fixEnabled;
     }
 
 
@@ -429,5 +265,104 @@ public class Settings {
 
     public void setReadonlyApi(boolean readonlyApi) {
         _readonlyApi = Boolean.valueOf(readonlyApi);
+    }
+
+
+    private boolean _showAllTrades = false;
+
+    public boolean showAllTrades() {
+        return _showAllTrades;
+    }
+
+    public void setShowAllTrades(boolean showAllTrades) {
+        _showAllTrades = showAllTrades;
+    }
+
+
+    private boolean _logToConsole = false;
+
+    public boolean logToConsole() {
+        return _logToConsole;
+    }
+
+    public void setLogToConsole(boolean logToConsole) {
+        _logToConsole = logToConsole;
+    }
+
+
+    private boolean _dismissNseCompliance = true;
+
+    public boolean dismissNseCompliance() {
+        return _dismissNseCompliance;
+    }
+
+    public void setDismissNseCompliance(boolean dismissNseCompliance) {
+        _dismissNseCompliance = dismissNseCompliance;
+    }
+
+
+    private boolean _dismissPasswordExpiry = false;
+
+    public boolean dismissPasswordExpiry() {
+        return _dismissPasswordExpiry;
+    }
+
+    public void setDismissPasswordExpiry(boolean dismissPasswordExpiry) {
+        _dismissPasswordExpiry = dismissPasswordExpiry;
+    }
+
+
+    private boolean _readonlyLogin = false;
+
+    public boolean readonlyLogin() {
+        return _readonlyLogin;
+    }
+
+    public void setReadonlyLogin(boolean readonlyLogin) {
+        _readonlyLogin = readonlyLogin;
+    }
+
+
+    private boolean _autoClosedown = false;
+
+    public boolean autoClosedown() {
+        return _autoClosedown;
+    }
+
+    public void setAutoClosedown(boolean autoClosedown) {
+        _autoClosedown = autoClosedown;
+    }
+
+
+    private boolean _allowBlindTrading = false;
+
+    public boolean allowBlindTrading() {
+        return _allowBlindTrading;
+    }
+
+    public void setAllowBlindTrading(boolean allowBlindTrading) {
+        _allowBlindTrading = allowBlindTrading;
+    }
+
+
+    private boolean _minimizeMainWindow = false;
+
+    public boolean minimizeMainWindow() {
+        return _minimizeMainWindow;
+    }
+
+    public void setMinimizeMainWindow(boolean minimizeMainWindow) {
+        _minimizeMainWindow = minimizeMainWindow;
+    }
+
+
+    private boolean _acceptNonBrokerageAccountWarning = false;
+
+    public boolean acceptNonBrokerageAccountWarning() {
+        return _acceptNonBrokerageAccountWarning;
+    }
+
+    public void setAcceptNonBrokerageAccountWarning(boolean accept) {
+        _acceptNonBrokerageAccountWarning = accept;
     }
 }

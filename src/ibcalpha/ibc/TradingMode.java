@@ -25,10 +25,14 @@ public enum TradingMode {
 
     public static TradingMode fromString(String mode)
             throws IllegalArgumentException {
-        if (mode.equalsIgnoreCase("live")) {
-            return TradingMode.LIVE;
-        } else if (mode.equalsIgnoreCase("paper")) {
-            return TradingMode.PAPER;
+        switch (mode.toLowerCase()) {
+            case "live":
+            case "livetrading":
+                return TradingMode.LIVE;
+
+            case "paper":
+            case "papertrading":
+                return TradingMode.PAPER;
         }
 
         throw new IllegalArgumentException("Invalid trading mode: " + mode);

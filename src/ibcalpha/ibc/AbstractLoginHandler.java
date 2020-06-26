@@ -99,7 +99,7 @@ public abstract class AbstractLoginHandler implements WindowHandler {
             }
         } else {
             JComboBox<?> tradingModeCombo;
-            if (Settings.settings().getFixEnabled()) {
+            if (Settings.settings().fixEnabled()) {
                 tradingModeCombo = SwingUtils.findComboBox(window, 1);
             } else {
                 tradingModeCombo = SwingUtils.findComboBox(window, 0);

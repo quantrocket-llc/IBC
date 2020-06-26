@@ -34,7 +34,10 @@ public class NSEComplianceFrameHandler  implements WindowHandler {
     }
 
     public void handleWindow(Window window, int eventID) {
-        if (! Settings.settings().getBoolean("DismissNSEComplianceNotice", true)) return;
+        if (! Settings.settings().dismissNseCompliance()) {
+            return;
+        }
+
         window.setVisible(false);
         window.dispose();
         Utils.logToConsole("NSE Compliance Dialog disposed");

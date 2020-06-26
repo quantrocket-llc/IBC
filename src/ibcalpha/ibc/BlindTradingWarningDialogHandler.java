@@ -33,7 +33,9 @@ class BlindTradingWarningDialogHandler implements WindowHandler {
     }
 
     public void handleWindow(Window window, int eventID) {
-        if (! Settings.settings().getBoolean("AllowBlindTrading", false)) return;
+        if (! Settings.settings().allowBlindTrading()) {
+            return;
+        }
 
         if (! SwingUtils.clickButton(window, "Yes")) {
             Utils.logError("could not dismiss blind trading warning dialog.");

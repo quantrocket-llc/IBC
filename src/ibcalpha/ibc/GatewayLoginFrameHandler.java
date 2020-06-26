@@ -47,7 +47,7 @@ final class GatewayLoginFrameHandler extends AbstractLoginHandler {
     @Override
     protected final boolean preLogin(final Window window, int eventID) throws IbcException {
         boolean result;
-        if (Settings.settings().getFixEnabled()) {
+        if (Settings.settings().fixEnabled()) {
             result = setMissingFIXCredentials(window);
         } else {
             result =setMissingIBAPICredentials(window);
@@ -89,7 +89,7 @@ final class GatewayLoginFrameHandler extends AbstractLoginHandler {
 
     @Override
     protected final boolean setFields(Window window, int eventID) throws IbcException {
-        if (Settings.settings().getFixEnabled()) {
+        if (Settings.settings().fixEnabled()) {
             setCredential(window, "FIX user name", 0, Settings.settings().fixLoginId());
             setCredential(window, "FIX password", 1, Settings.settings().fixPassword());
             setCredential(window, "IBAPI user name", 2, Settings.settings().ibLoginId());
@@ -102,7 +102,7 @@ final class GatewayLoginFrameHandler extends AbstractLoginHandler {
     }
     
     private void selectGatewayMode(Window window) throws IbcException {
-        if (Settings.settings().getFixEnabled()) {
+        if (Settings.settings().fixEnabled()) {
             switchToFIX(window);
         } else {
             switchToIBAPI(window);

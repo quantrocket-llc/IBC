@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * @author stevek
  *
@@ -211,77 +212,39 @@ public class IbcTws {
         if (Thread.getDefaultUncaughtExceptionHandler() == null) {
             Thread.setDefaultUncaughtExceptionHandler(new ibcalpha.ibc.UncaughtExceptionHandler());
         }
-        checkArguments(args);
         setupDefaultEnvironment(args, false);
         load();
     }
     
     static void setupDefaultEnvironment(final String[] args, final boolean isGateway) throws Exception {
-        Settings.settings().loadFromArgs(args);
         MainWindowManager.mainWindowManager().setIsGateway(isGateway);
 
-        (new SettingsParser(Settings.settings())).parse();
-        (new ArgumentParser(Settings.settings())).parse(args);
-    }
+        // Parse once to acquire settingsPath()
+        ArgumentParser argParser = new ArgumentParser(Settings.settings());
+        argParser.parse(args);
 
-    static void checkArguments(String[] args) {
-        /**
-         * Allowable parameter combinations:
-         * 
-         * 1. No parameters
-         * 
-         * 2. <iniFile> [<tradingMode>]
-         * 
-         * 3. <iniFile> <apiUserName> <apiPassword> [<tradingMode>]
-         * 
-         * 4. <iniFile> <fixUserName> <fixPassword> <apiUserName> <apiPassword> [<tradingMode>]
-         * 
-         * where:
-         * 
-         *      <iniFile>       ::= NULL | path-and-filename-of-.ini-file 
-         * 
-         *      <tradingMode>   ::= blank | LIVETRADING | PAPERTRADING
-         * 
-         *      <apiUserName>   ::= blank | username-for-TWS
-         * 
-         *      <apiPassword>   ::= blank | password-for-TWS
-         * 
-         *      <fixUserName>   ::= blank | username-for-FIX-CTCI-Gateway
-         * 
-         *      <fixPassword>   ::= blank | password-for-FIX-CTCI-Gateway
-         * 
-         */
-        if (args.length > 6) {
-            Utils.logError("Incorrect number of arguments passed. quitting...");
-            Utils.logRawToConsole("Number of arguments = " +args.length);
-            for (String arg : args) {
-                Utils.logRawToConsole(arg);
-            }
-            Utils.exitWithError(ErrorCodes.ERROR_CODE_INCORRECT_NUMBER_OF_ARGUMENTS);
-        }
+        SettingsParser parser = new SettingsParser(Settings.settings());
+        parser.parse(argParser.settingsPath());
+
+        // Parse again to overwrite INI values with command line values.
+        argParser.parse(args);
     }
 
     public static void load() {
         printVersionInfo();
-        
         printProperties();
-        
-        Settings.settings().logDiagnosticMessage();
+
         MainWindowManager.mainWindowManager().logDiagnosticMessage();
         ConfigDialogManager.configDialogManager().logDiagnosticMessage();
-        
+
         boolean isGateway = MainWindowManager.mainWindowManager().isGateway();
-        
+
         startCommandServer(isGateway);
-
         startShutdownTimerIfRequired(isGateway);
-
         createToolkitListener();
-        
         startSavingTwsSettingsAutomatically();
-
         startTwsOrGateway(isGateway);
-}
+    }
 
     public static void printVersionInfo() {
         Utils.logToConsole("version: " + IbcVersionInfo.IBC_VERSION);
@@ -380,7 +343,7 @@ public class IbcTws {
     }
 
     private static void startTws() {
-        if (Settings.settings().getBoolean("ShowAllTrades", false)) {
+        if (Settings.settings().showAllTrades()) {
             Utils.showTradesLogWindow();
         }
         String[] twsArgs = new String[1];
@@ -414,7 +377,7 @@ public class IbcTws {
             )).executeAsync();
         }
 
-        Utils.sendConsoleOutputToTwsLog(!Settings.settings().getBoolean("LogToConsole", false));
+        Utils.sendConsoleOutputToTwsLog(! Settings.settings().logToConsole());
     }
     
     private static void startSavingTwsSettingsAutomatically() {

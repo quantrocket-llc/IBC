@@ -195,7 +195,9 @@ public class MainWindowManager {
 
     public void iconizeIfRequired() {
         Utils.logToConsole("Minimizing main window");
-        if (Settings.settings().getBoolean("MinimizeMainWindow", false)) mainWindow.setExtendedState(java.awt.Frame.ICONIFIED);
+        if (Settings.settings().minimizeMainWindow()) {
+            mainWindow.setExtendedState(java.awt.Frame.ICONIFIED);
+        }
         lastMinimizeTime = Calendar.getInstance().getTimeInMillis();
     }
 }

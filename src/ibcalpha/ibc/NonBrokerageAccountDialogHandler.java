@@ -35,7 +35,9 @@ public class NonBrokerageAccountDialogHandler  implements WindowHandler {
 
     @Override
     public void handleWindow(Window window, int eventID) {
-        if (! Settings.settings().getBoolean("AcceptNonBrokerageAccountWarning", true)) return;
+        if (! Settings.settings().acceptNonBrokerageAccountWarning()) {
+            return;
+        }
 
         GuiDeferredExecutor.instance().execute(() -> MainWindowManager.mainWindowManager().iconizeIfRequired());
         

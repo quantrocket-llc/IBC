@@ -18,7 +18,6 @@
 
 package ibcalpha.ibc;
 
-import static ibcalpha.ibc.IbcTws.checkArguments;
 import static ibcalpha.ibc.IbcTws.setupDefaultEnvironment;
 
 public class IbcGateway {
@@ -26,7 +25,6 @@ public class IbcGateway {
         if (Thread.getDefaultUncaughtExceptionHandler() == null) {
             Thread.setDefaultUncaughtExceptionHandler(new ibcalpha.ibc.UncaughtExceptionHandler());
         }
-        checkArguments(args);
         setupDefaultEnvironment(args, true);
         IbcTws.load();
     }
