@@ -61,11 +61,19 @@ class TwsListener implements AWTEventListener {
         String event = SwingUtils.windowEventToString(eventID);
 
         if (window instanceof JFrame) {
-            Utils.logToConsole("detected frame entitled: " + ((JFrame) window).getTitle() + "; event=" + event);
+            Utils.logToConsole("detected JFrame (%s) entitled: %s; event=%s",
+                               window.getClass().getName(),
+                               ((JFrame) window).getTitle(),
+                               event);
         } else if (window instanceof JDialog) {
-            Utils.logToConsole("detected dialog entitled: " + ((JDialog) window).getTitle() + "; event=" + event);
+            Utils.logToConsole("detected JDialog (%s) entitled: %s; event=%s",
+                               window.getClass().getName(),
+                               ((JDialog) window).getTitle(),
+                               event);
         } else {
-            Utils.logToConsole("detected window: type=" + window.getClass().getName() + "; event=" + event);
+            Utils.logToConsole("detected Window (%s); event=%s",
+                               window.getClass().getName(),
+                               event);
         }
 
         ComponentLogPolicy policy = Settings.settings().componentLogPolicy();

@@ -134,8 +134,8 @@ class Utils {
      * @param msg
      * The message to be written
      */
-    static void logToConsole(String msg) {
-        getOutStream().println(formatMessage(msg));
+    static void logToConsole(String msg, Object... args) {
+        getOutStream().println(formatMessage(String.format(msg, args)));
     }
     
     static PrintStream getErrStream() {
