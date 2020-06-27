@@ -24,30 +24,31 @@ import javax.swing.JDialog;
 
 class AcceptIncomingConnectionDialogHandler implements WindowHandler {
     public boolean filterEvent(Window window, int eventId) {
-        switch (eventId) {
-            case WindowEvent.WINDOW_OPENED:
-                return true;
-            default:
-                return false;
-        }
+        return eventId == WindowEvent.WINDOW_OPENED;
+    }
+
+    public boolean recogniseWindow(Window window) {
+        return (
+            window instanceof JDialog &&
+            (SwingUtils.findLabel(window, "Accept incoming connection") != null)
+        );
     }
 
     public void handleWindow(Window window, int eventID) {
         switch (Settings.settings().incomingConnectionPolicy()) {
             case MANUAL:
+                Utils.logToConsole("not confirming incoming connection because AcceptIncomingConnectionAction set to manual.");
                 return;
 
             case ACCEPT:
-                if (SwingUtils.clickButton(window, "OK")) {
-                } else if (SwingUtils.clickButton(window, "Yes")) {
-                } else {
+                if (! (SwingUtils.clickButton(window, "OK") ||
+                       SwingUtils.clickButton(window, "Yes"))) {
                     Utils.logError("could not accept incoming connection because we could not find one of the controls.");
                 }
                 return;
 
             case REJECT:
-                if (SwingUtils.clickButton(window, "No")) {
-                } else {
+                if (! SwingUtils.clickButton(window, "No")) {
                     Utils.logError("could not accept incoming connection because we could not find one of the controls.");
                 }
                 return;
@@ -56,11 +57,4 @@ class AcceptIncomingConnectionDialogHandler implements WindowHandler {
                 Utils.logError("could not accept incoming connection because the AcceptIncomingConnectionAction setting is invalid.");
         }
     }
-
-    public boolean recogniseWindow(Window window) {
-        if (! (window instanceof JDialog)) return false;
-
-        return (SwingUtils.findLabel(window, "Accept incoming connection") != null);
-    }
 }
-
