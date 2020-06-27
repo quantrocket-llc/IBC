@@ -280,6 +280,7 @@ public class IbcTws {
         windowHandlers.add(new NonBrokerageAccountDialogHandler());
         windowHandlers.add(new ExitConfirmationDialogHandler());
         windowHandlers.add(new TradingLoginHandoffDialogHandler());
+        windowHandlers.add(new ApiAnnouncementsDialogHandler());
         
         return windowHandlers;
     }
