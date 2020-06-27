@@ -281,6 +281,7 @@ public class IbcTws {
         windowHandlers.add(new ExitConfirmationDialogHandler());
         windowHandlers.add(new TradingLoginHandoffDialogHandler());
         windowHandlers.add(new ApiAnnouncementsDialogHandler());
+        windowHandlers.add(new GettingStartedDialogHandler());
         
         return windowHandlers;
     }
