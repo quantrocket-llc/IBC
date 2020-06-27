@@ -376,4 +376,15 @@ public class Settings {
     public void setSendTwsLogsToConsole(boolean send) {
         _sendTwsLogsToConsole = send;
     }
+
+
+    private boolean _maximizeMainWindow = false;
+
+    public boolean maximizeMainWindow() {
+        return _maximizeMainWindow;
+    }
+
+    public void setMaximizeMainWindow(boolean maximize) {
+        _maximizeMainWindow = maximize;
+    }
 }

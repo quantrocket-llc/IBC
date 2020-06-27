@@ -159,6 +159,12 @@ public class MainWindowManager {
     public void setLoginComplete() {
         Utils.logToConsole("Login completed");
         loginCompleted = true;
+
+        if (Settings.settings().maximizeMainWindow()) {
+            mainWindow.setExtendedState(
+                mainWindow.getExtendedState()|JFrame.MAXIMIZED_BOTH
+            );
+        }
     }
 
     private final WindowStateListener listener = new WindowStateListener() {

@@ -89,6 +89,8 @@ public class SettingsParser {
         _settings.setReadonlyLogin(parser.getBoolean("ReadOnlyLogin", false));
         _settings.setMinimizeMainWindow(
             parser.getBoolean("MinimizeMainWindow", false));
+        _settings.setMaximizeMainWindow(
+            parser.getBoolean("MaximizeMainWindow", false));
         _settings.setAutoClosedown(
             parser.getBoolean("IbAutoClosedown", false));
         _settings.setAllowBlindTrading(
