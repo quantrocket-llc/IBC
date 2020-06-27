@@ -365,4 +365,15 @@ public class Settings {
     public void setAcceptNonBrokerageAccountWarning(boolean accept) {
         _acceptNonBrokerageAccountWarning = accept;
     }
+
+
+    private boolean _sendTwsLogsToConsole = false;
+
+    public boolean sendTwsLogsToConsole() {
+        return _sendTwsLogsToConsole;
+    }
+
+    public void setSendTwsLogsToConsole(boolean send) {
+        _sendTwsLogsToConsole = send;
+    }
 }

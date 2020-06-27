@@ -97,6 +97,8 @@ public class SettingsParser {
             parser.getBoolean("DismissPasswordExpiryWarning", false));
         _settings.setDismissNseCompliance(
             parser.getBoolean("DismissNSEComplianceNotice", true));
+        _settings.setSendTwsLogsToConsole(
+            parser.getBoolean("SendTWSLogsToConsole", false));
     }
 
     private void _parseTwsSaveSettingsAt(PropertyParser parser) {

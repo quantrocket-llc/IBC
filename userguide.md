@@ -432,31 +432,38 @@ here is a list of the settings that you are most likely to need to change:
 
 | Setting                        | Notes                                       |
 | ------------------------------ | --------------------------------------------|
-| IbLoginID                      | You must set this to your IBKR username     |
-| Password                       | You must set this to your IBKR password       |
+| IbLoginId                      | You must set this to your IBKR username     |
+| ------------------------------ | --------------------------------------------|
+| Password                       | You must set this to your IBKR password     |
+| ------------------------------ | --------------------------------------------|
 | TradingMode                    | For TWS 955 and later, you must set this to |
 |                                | `paper` if you have supplied the username   |
 |                                | and password for your live account but      |
 |                                | actually want to use your paper account.    |
 |                                | Otherwise you can omit the setting entirely |
 |                                | or set it to `live`                         |
+| ------------------------------ | --------------------------------------------|
 | IbDir                          | You only need to set this if you want TWS   |
 |                                | to store its settings in a different folder |
 |                                | from the one it's installed in              |
+| ------------------------------ | --------------------------------------------|
 | AcceptIncomingConnectionAction | It is safest to set this to `reject` and to |
 |                                | explicitly configure TWS to specify which   |
 |                                | IP addresses are allowed to connnect to the |
 |                                | API                                         |
+| ------------------------------ | --------------------------------------------|
 | IbAutoClosedown                | Set this to `no` to prevent TWS's daily     |
 |                                | auto closedown: NB this setting no longer   |
 |                                | works with TWS 974 and later                |
+| ------------------------------ | --------------------------------------------|
 | ClosedownAt                    | Set this if you want to keep TWS running    |
 |                                | until a specified time of day on a          |
 |                                | particular day of the week, or to specify a |
 |                                | time when Gateway should be shut down every |
 |                                | day (a daily shutdown time for TWS can be   |
 |                                | specified through TWS's own configuration   |
-                                 | dialog.                                     |
+|                                | dialog.                                     |
+| ------------------------------ | --------------------------------------------|
 
 
 There are two ways that IBC can locate your edited `config.ini` file.
