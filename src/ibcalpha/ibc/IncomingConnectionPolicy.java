@@ -26,12 +26,13 @@ public enum IncomingConnectionPolicy {
 
     public static IncomingConnectionPolicy fromString(String mode)
             throws IllegalArgumentException {
-        if (mode.equalsIgnoreCase("accept")) {
-            return ACCEPT;
-        } else if (mode.equalsIgnoreCase("reject")) {
-            return REJECT;
-        } else if (mode.equalsIgnoreCase("manual")) {
-            return MANUAL;
+        switch (mode.toLowerCase()) {
+            case "accept":
+                return ACCEPT;
+            case "reject":
+                return REJECT;
+            case "manual":
+                return MANUAL;
         }
 
         throw new IllegalArgumentException("Invalid incoming connection policy: " + mode);
@@ -46,8 +47,8 @@ public enum IncomingConnectionPolicy {
                 return "reject";
             case MANUAL:
                 return "manual";
-            default:
-                throw new IllegalArgumentException();
         }
+
+        throw new IllegalArgumentException();
     }
 }

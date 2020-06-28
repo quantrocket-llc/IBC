@@ -27,14 +27,15 @@ public enum ExistingSessionPolicy {
 
     public static ExistingSessionPolicy fromString(String mode)
             throws IllegalArgumentException {
-        if (mode.equalsIgnoreCase("primary")) {
-            return PRIMARY;
-        } else if (mode.equalsIgnoreCase("primaryoverride")) {
-            return PRIMARY_OVERRIDE;
-        } else if (mode.equalsIgnoreCase("secondary")) {
-            return SECONDARY;
-        } else if (mode.equalsIgnoreCase("manual")) {
-            return MANUAL;
+        switch (mode.toLowerCase()) {
+            case "primary":
+                return PRIMARY;
+            case "primaryoverride":
+                return PRIMARY_OVERRIDE;
+            case "secondary":
+                return SECONDARY;
+            case "manual":
+                return MANUAL;
         }
 
         throw new IllegalArgumentException("Invalid existing session policy: " + mode);

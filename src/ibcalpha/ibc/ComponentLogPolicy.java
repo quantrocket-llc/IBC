@@ -54,8 +54,8 @@ public enum ComponentLogPolicy {
                 return "open";
             case NEVER:
                 return "never";
-            default:
-                throw new IllegalArgumentException();
         }
+
+        throw new IllegalArgumentException();
     }
 }
