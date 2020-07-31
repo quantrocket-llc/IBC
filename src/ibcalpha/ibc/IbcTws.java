@@ -218,7 +218,9 @@ public class IbcTws {
         Settings.settings().setIsGateway(false);
         installExceptionHandler();
         setupDefaultEnvironment(args);
-        load();
+        initialize();
+        startTwsOrGateway();
+        startInitialTasks();
     }
     
     static void setupDefaultEnvironment(final String[] args) throws Exception {
@@ -233,7 +235,7 @@ public class IbcTws {
         argParser.parse(args);
     }
 
-    public static void load() {
+    public static void initialize() {
         printVersionInfo();
         printProperties();
 
@@ -244,7 +246,6 @@ public class IbcTws {
         startShutdownTimerIfRequired();
         createToolkitListener();
         startSavingTwsSettingsAutomatically();
-        startTwsOrGateway();
     }
 
     public static void printVersionInfo() {
@@ -360,7 +361,7 @@ public class IbcTws {
         }
     }
     
-    private static void startTwsOrGateway() {
+    public static void startTwsOrGateway() {
         Utils.logToConsole("TWS Settings directory is: " + getTWSSettingsDirectory());
         JtsIniManager.initialise(getJtsIniFilePath());
         if (Settings.settings().isGateway()) {
@@ -368,7 +369,9 @@ public class IbcTws {
         } else {
             startTws();
         }
+    }
 
+    public static void startInitialTasks() {
         int portNumber = Settings.settings().overrideTwsApiPort();
         if (portNumber != 0) (new ConfigurationTask(new ConfigureTwsApiPortTask(portNumber))).executeAsync();
 
@@ -380,7 +383,7 @@ public class IbcTws {
             )).executeAsync();
         }
     }
-    
+
     private static void startSavingTwsSettingsAutomatically() {
         TwsSettingsSaver.getInstance().initialise();
     }

@@ -26,7 +26,9 @@ public class IbcGateway {
         Settings.settings().setIsGateway(true);
         IbcTws.installExceptionHandler();
         IbcTws.setupDefaultEnvironment(args);
-        IbcTws.load();
+        IbcTws.initialize();
+        IbcTws.startTwsOrGateway();
+        IbcTws.startInitialTasks();
     }
 
     public static void printVersionInfo() {
