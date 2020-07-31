@@ -133,7 +133,10 @@ class Utils {
      * The message to be written
      */
     static void logToConsole(String msg, Object... args) {
-        getOutStream().println(formatMessage(String.format(msg, args)));
+        if (args.length > 0) {
+            msg = String.format(msg, args);
+        }
+        getOutStream().println(formatMessage(msg));
     }
     
     static PrintStream getErrStream() {

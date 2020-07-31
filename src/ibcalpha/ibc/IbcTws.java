@@ -246,6 +246,9 @@ public class IbcTws {
         startShutdownTimerIfRequired();
         createToolkitListener();
         startSavingTwsSettingsAutomatically();
+
+        Utils.logToConsole("TWS Settings directory is: " + getTWSSettingsDirectory());
+        JtsIniManager.initialise(getJtsIniFilePath());
     }
 
     public static void printVersionInfo() {
@@ -362,8 +365,6 @@ public class IbcTws {
     }
     
     public static void startTwsOrGateway() {
-        Utils.logToConsole("TWS Settings directory is: " + getTWSSettingsDirectory());
-        JtsIniManager.initialise(getJtsIniFilePath());
         if (Settings.settings().isGateway()) {
             startGateway();
         } else {

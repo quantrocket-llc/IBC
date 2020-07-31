@@ -1,62 +1,50 @@
-# **IBC USER GUIDE**
+# IBC USER GUIDE
 
->IMPORTANT NOTES REGARDING TWS 974 and Gateway 975 and later versions
->
->In TWS 974, IBKR have changed the way the autologoff function works within
-TWS. Starting with that version, when the time approaches the configured
-autologoff time, logoff can be deferred once by changing the autologoff time in
-the 'Exit Session Setting' dialog as in earlier versions, but when the new
-autologoff time arrives, TWS will logoff even if the user (or IBC) changes the
-autologoff time again.
->
->This defeats the mechanism that IBC used with earlier TWS versions to prevent
-autologoff, by changing the configured autologoff each time the 'Exit Session
-Setting' dialog was displayed. Because of this, you should no longer use the
-`IbAutoClosedown=no` setting because it won't work properly.
->
->Furthermore, in Gateway 975 IBKR have introduced the same autologoff
-functionality as TWS: ie the Gateway will no longer run continuously, and will
-insist on shutting down every day.
->
->Instead you have two options:
->
->1. Restart IBC afresh each day you want to run TWS or Gateway. This option is
-useful if you want to automate login to TWS, and you're not enrolled in IBKR's
-security device scheme (so that you do not need to be present). You can use Task
-Scheduler (on Windows) or crontab (on Linux) to automatically start IBC at the
-appropriate time. You'll find sections on using Task Scheduler or crontab to
-start IBC towards the end of this document.
->
->2. Abandon the use of IBC and instead use the autorestart mechanism provided
-by TWS 974, Gateway 975 and later versions. To use this, you have to start TWS
-or Gateway with the .exe files or scripts provided by IBKR, because IBC cannot
-work with this mechanism. On Windows, these files are `C:\Jts\nnn\tws.exe` for
-TWS, and `C:\Jts\ibgateway\nnn\ibgateway.exe` for Gateway (note that desktop
-icons are also provided).  On Linux, the files are `~/Jts/nnn/tws` for TWS, and
-`~/Jts/ibgateway/nnn/ibgateway` for Gateway. nnn is the TWS version number.
 
->IMPORTANT
->
->If you have previously been using IBController and are switching over to IBC,
+## Important Notes
+
+### Auto-restart in TWS 974 and Gateway 975
+
+TWS 974 and Gateway 975 changed how autologoff works. When the configured time
+approaches, logoff can be deferred once by changing the autologoff time in the
+'Exit Session Setting' dialog as in earlier versions, but when the new time
+arrives, TWS will logoff even if the autologoff time is changed again. The
+`IbAutoClosedown=no` setting therefore no longer works properly.
+
+There are two alternatives:
+
+1. Configure the TWS 974 and Gateway 975 auto-restart function, and configure
+   IBC to run as a Java agent. See the **Java Agent Mode** section below for
+   more information.
+
+2. Restart IBC each day. This is useful if you want to automate login to TWS,
+   and you're not enrolled in IBKR's security device scheme (so that you do not
+   need to be present). You can use Task Scheduler (on Windows) or crontab (on
+   Linux) to start IBC at the appropriate time. You'll find sections on using
+   Task Scheduler or crontab to start IBC towards the end of this document.
+
+
+### Differences Between IBController and IBC
+
+If you have previously been using IBController and are switching over to IBC,
 there are some differences that you need to be aware of: there is more
 information about this in the **Changes from IBController** section at the end
 of this document.
->
->Make sure you read the information in the **Scope of this User Guide** section.
->
->IBC can be used to start TWS running the demo account. However
-there are many ways in which the demo account differs from a live or a paper
-trading account, which may occasionally cause some inconvenience. In
-particular when you login to the demo account you are actually allocated
-a random account number, and when you log out this account may then be
-allocated to another user. Next time you log in to the demo account, you are
-unlikely to be allocated the same account as before, and even if you are given
-the same one, any settings you made last time round will have changed.
-IBC makes no attempt to avoid these situations: they are simply
-an inevitable by-product of using the demo system, which is not intended
-for any serious usage.
->
->Note that in the remainder of this document, 'Unix' is used to refer to all
+
+Make sure you read the information in the **Scope of this User Guide** section.
+
+IBC can be used to start TWS running the demo account. However there are many
+ways in which the demo account differs from a live or a paper trading account,
+which may occasionally cause some inconvenience. In particular when you login
+to the demo account you are actually allocated a random account number, and
+when you log out this account may then be allocated to another user. Next time
+you log in to the demo account, you are unlikely to be allocated the same
+account as before, and even if you are given the same one, any settings you
+made last time round will have changed. IBC makes no attempt to avoid these
+situations: they are simply an inevitable by-product of using the demo system,
+which is not intended for any serious usage.
+
+Note that in the remainder of this document, 'Unix' is used to refer to all
 Unix-derived operating systems, including Linux and macOS.
 
 
@@ -499,6 +487,75 @@ Windows users can execute a shell script in a number of ways, including:
 If you used the default locations to install IBC and TWS, and to store your
 config.ini file, you should not need to edit the shell scripts. If you do need
 to change them, they are commented to help you.
+
+
+## Java Agent Mode
+
+IBC can run using the Java Instrumentation API. In this mode, the
+`tws.vmoptions` or `ibgateway.vmoptions` file is updated to include a new
+parameter. This parameter tells Java to load IBC early during the regular TWS
+or Gateway startup process. With the `.vmoptions` parameter present, any
+attempt to start TWS or Gateway using normal entry points (`.exe` program file
+or desktop icons) will cause IBC to be transparently loaded.
+
+The primary advantage of Agent mode is no changes are made to how TWS or
+Gateway is started, permitting its auto-restart functionality to operate
+correctly. With auto-restart, TWS automatically restarts itself each day rather
+than logging off, requiring manual two-factor authentication only once per
+week, on Sundays. This vastly increases the time between manual interventions
+for a 2FA-enabled account running under IBC.
+
+### Installation
+
+1. Locate `tws.vmoptions` or `ibgateway.vmoptions` by following [the Interactive Brokers documentation](https://www.interactivebrokers.com/en/software/tws/usersguidebook/priceriskanalytics/custommemory.htm).
+
+2. Add the line: `-javaagent:/path/to/IBC.jar` (UNIX) or
+   `-javaagent:C:\\IBC\\IBC.jar`, using the complete path to the IBC jar
+   included in the release download.
+
+3. You may specify space-separated IBC command line parameters, by placing an
+   `=` (equals) sign after the Jar path, then writing the parameters.
+
+
+### Allowable Parameters
+
+Allowable parameter combinations:
+
+1. No parameters
+
+2. `<iniFile> [<tradingMode>]`
+
+3. `<iniFile> <apiUserName> <apiPassword> [<tradingMode>]`
+
+4. `<iniFile> <fixUserName> <fixPassword> <apiUserName> <apiPassword> [<tradingMode>]`
+
+Where:
+
+```
+     <iniFile>       ::= NULL | path-and-filename-of-.ini-file 
+
+     <tradingMode>   ::= blank | LIVETRADING | PAPERTRADING
+
+     <apiUserName>   ::= blank | username-for-TWS
+
+     <apiPassword>   ::= blank | password-for-TWS
+
+     <fixUserName>   ::= blank | username-for-FIX-CTCI-Gateway
+
+     <fixPassword>   ::= blank | password-for-FIX-CTCI-Gateway
+```
+
+
+### Examples
+
+Load IBC from `C:\IBC\IBC.jar`, and use `C:\IBC\live.ini` for the INI file:
+
+`-javaagent:C:\\IBC\\IBC.jar=C:\\IBC\\live.ini`
+
+As above, but login with paper trading:
+
+`-javaagent:C:\\IBC\\IBC.jar=C:\\IBC\\live.ini PAPERTRADING`
+
 
 ## Other Topics
 

@@ -40,7 +40,11 @@ public class IbcVersionInfo {
     </target>
 
     <target name="jar" depends="compile" description="generate the jar">
-        <jar jarfile="${resources}/IBC.jar" basedir="${target}/classes"/>
+        <jar jarfile="${resources}/IBC.jar" basedir="${target}/classes">
+            <manifest>
+                <attribute name="Premain-Class" value="ibcalpha.ibc.Agent"/>
+            </manifest>
+        </jar>
     </target>
 
     <target name="dist" depends="jar" description="generate the distribution zip">
