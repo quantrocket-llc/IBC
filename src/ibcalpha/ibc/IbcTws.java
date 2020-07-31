@@ -379,8 +379,6 @@ public class IbcTws {
                 )
             )).executeAsync();
         }
-
-        Utils.sendConsoleOutputToTwsLog(! Settings.settings().logToConsole());
     }
     
     private static void startSavingTwsSettingsAutomatically() {

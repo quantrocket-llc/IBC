@@ -40,8 +40,6 @@ class Utils {
     private static final PrintStream out = System.out;
     private static final PrintStream err = System.err;
     
-    private static boolean sendConsoleOutputToTwsLog = false;
-    
     /**
      * Performs a click on the menu item at the specified path, waiting if necessary for the
      * menu item to become enabled.
@@ -139,7 +137,7 @@ class Utils {
     }
     
     static PrintStream getErrStream() {
-        if (sendConsoleOutputToTwsLog) {
+        if (! Settings.settings().logToConsole()) {
             return System.err;
         } else {
             return err;
@@ -147,7 +145,7 @@ class Utils {
     }
     
     static PrintStream getOutStream() {
-        if (sendConsoleOutputToTwsLog) {
+        if (! Settings.settings().logToConsole()) {
             return System.out;
         } else {
             return out;
@@ -217,10 +215,4 @@ class Utils {
                 @Override public void run() {invokeMenuItem(MainWindowManager.mainWindowManager().getMainWindow(), new String[] {"Account", "Trade Log"});}
             });
     }
-    
-    static void sendConsoleOutputToTwsLog(boolean value) {
-        sendConsoleOutputToTwsLog = value;
-    }
-
 }
-
