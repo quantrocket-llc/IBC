@@ -33,13 +33,8 @@ class CommandServer
 
     private ServerSocket mSocket = null;
     private volatile boolean mQuitting = false;
-    
-    private final boolean isGateway;
-    
 
-
-    CommandServer(boolean isGateway) {
-        this.isGateway = isGateway;
+    CommandServer() {
     }
 
     @Override
@@ -59,7 +54,7 @@ class CommandServer
             for (; !mQuitting;) {
                 Socket socket = getClient();
 
-                if (socket != null)  MyCachedThreadPool.getInstance().execute(new CommandDispatcher(new CommandChannel(socket), isGateway));
+                if (socket != null)  MyCachedThreadPool.getInstance().execute(new CommandDispatcher(new CommandChannel(socket)));
             }
 
             try {

@@ -31,17 +31,15 @@ class GetConfigDialogTask implements Callable<JDialog>{
     private final Lock lock = new ReentrantLock();
     private final Condition gotConfigDialog = lock.newCondition();
     private final Condition gatewayInitialised = lock.newCondition();
-    private final boolean isGateway;
-    
-    GetConfigDialogTask(boolean isGateway) {
-        this.isGateway = isGateway;
+
+    GetConfigDialogTask() {
     }
-    
+
     @Override
     public JDialog call() throws IbcException, InterruptedException {
         final JFrame mainForm = MainWindowManager.mainWindowManager().getMainWindow();
         
-        if (isGateway) {
+        if (Settings.settings().isGateway()) {
             /*
              * For the gateway, the main form is loaded right at the start, and long before
              * the menu items become responsive: any attempt to access the Configure > Settings
@@ -66,7 +64,7 @@ class GetConfigDialogTask implements Callable<JDialog>{
             }
         }
         
-        if (isGateway) {
+        if (Settings.settings().isGateway()) {
             if (!Utils.invokeMenuItem(mainForm, new String[] {"Configure", "Settings"})) throw new IbcException("'Configure > Settings' menu item");
         } else if (Utils.invokeMenuItem(mainForm, new String[] {"Edit", "Global Configuration..."})) /* TWS's Classic layout */ {
         } else if (Utils.invokeMenuItem(mainForm, new String[] {"File", "Global Configuration..."})) /* TWS's Mosaic layout */ {
@@ -96,7 +94,7 @@ class GetConfigDialogTask implements Callable<JDialog>{
     }
     
     void setSplashScreenClosed() {
-        if (!isGateway) return;
+        if (! Settings.settings().isGateway()) return;
         lock.lock();
         try {
             mGatewayInitialised = true;

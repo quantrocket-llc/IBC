@@ -45,7 +45,7 @@ public class SplashFrameHandler implements WindowHandler {
 
     @Override
     public void handleWindow(Window window, int eventID) {
-        if (MainWindowManager.mainWindowManager().isGateway()) MainWindowManager.mainWindowManager().setLoginComplete();
+        if (Settings.settings().isGateway()) MainWindowManager.mainWindowManager().setLoginComplete();
 
         ConfigDialogManager.configDialogManager().setSplashScreenClosed();
     }

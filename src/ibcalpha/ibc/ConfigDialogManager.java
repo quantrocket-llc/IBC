@@ -134,7 +134,7 @@ public class ConfigDialogManager
                     Utils.logToConsole("Waiting for config dialog future to complete");
             } else {
                 Utils.logToConsole("Creating config dialog future");
-                configDialogTask = new GetConfigDialogTask(MainWindowManager.mainWindowManager().isGateway());
+                configDialogTask = new GetConfigDialogTask();
                 ExecutorService exec = Executors.newSingleThreadExecutor();
                 configDialogFuture = exec.submit((Callable<JDialog>)configDialogTask);
                 exec.shutdown();

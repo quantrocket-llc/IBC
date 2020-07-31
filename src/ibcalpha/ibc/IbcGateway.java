@@ -18,19 +18,18 @@
 
 package ibcalpha.ibc;
 
-import static ibcalpha.ibc.IbcTws.setupDefaultEnvironment;
+import ibcalpha.ibc.IbcTws;
+
 
 public class IbcGateway {
     public static void main(String[] args) throws Exception {
-        if (Thread.getDefaultUncaughtExceptionHandler() == null) {
-            Thread.setDefaultUncaughtExceptionHandler(new ibcalpha.ibc.UncaughtExceptionHandler());
-        }
-        setupDefaultEnvironment(args, true);
+        Settings.settings().setIsGateway(true);
+        IbcTws.installExceptionHandler();
+        IbcTws.setupDefaultEnvironment(args);
         IbcTws.load();
     }
 
     public static void printVersionInfo() {
         IbcTws.printVersionInfo();
     }
-
 }

@@ -42,7 +42,6 @@ public class MainWindowManager {
     private volatile GetMainWindowTask mainWindowTask;
     private final Object futureCreationLock = new Object();
     private Future<JFrame> mainWindowFuture;
-    private boolean isGateway = false;
     private String message;
     private Long lastMinimizeTime;
 
@@ -144,14 +143,6 @@ public class MainWindowManager {
         return getMainWindow(-1, TimeUnit.MILLISECONDS);
     }
 
-    public boolean isGateway() {
-        return this.isGateway;
-    };
-
-    public void setIsGateway(boolean isGateway) {
-        this.isGateway = isGateway;
-    };
-
     public boolean isLoginComplete() {
         return loginCompleted;
     }
@@ -182,13 +173,13 @@ public class MainWindowManager {
     };
 
     public void setMainWindow(JFrame window) {
-        Utils.logToConsole("Found " + (isGateway ? "Gateway" : "TWS") + " main window");
+        Utils.logToConsole("Found " + (Settings.settings().isGateway() ? "Gateway" : "TWS") + " main window");
         mainWindow = window;
 
         // For TWS, the main window being opened indicates that login is complete. This is not the case
         // for the Gateway, because the main window is created right at the start, but the splash frame
         // being closed indicates that login is complete (see the SplahFrameHandler).
-        if (! isGateway) setLoginComplete();
+        if (! Settings.settings().isGateway()) setLoginComplete();
 
         if (mainWindowTask != null) mainWindowTask.setMainWindow(window);
         mainWindowTask = null;

@@ -387,4 +387,19 @@ public class Settings {
     public void setMaximizeMainWindow(boolean maximize) {
         _maximizeMainWindow = maximize;
     }
+
+
+    /*
+     * Internal settings.
+     */
+
+    private boolean _isGateway = false;
+
+    public boolean isGateway() {
+        return _isGateway;
+    }
+
+    public void setIsGateway(boolean isGateway) {
+        _isGateway = isGateway;
+    }
 }

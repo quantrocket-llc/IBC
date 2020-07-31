@@ -207,18 +207,21 @@ import java.util.concurrent.TimeUnit;
 public class IbcTws {
 
     private IbcTws() { }
-    
-    public static void main(final String[] args) throws Exception {
+
+    public static void installExceptionHandler() {
         if (Thread.getDefaultUncaughtExceptionHandler() == null) {
             Thread.setDefaultUncaughtExceptionHandler(new ibcalpha.ibc.UncaughtExceptionHandler());
         }
-        setupDefaultEnvironment(args, false);
+    }
+
+    public static void main(final String[] args) throws Exception {
+        Settings.settings().setIsGateway(false);
+        installExceptionHandler();
+        setupDefaultEnvironment(args);
         load();
     }
     
-    static void setupDefaultEnvironment(final String[] args, final boolean isGateway) throws Exception {
-        MainWindowManager.mainWindowManager().setIsGateway(isGateway);
-
+    static void setupDefaultEnvironment(final String[] args) throws Exception {
         // Parse once to acquire settingsPath()
         ArgumentParser argParser = new ArgumentParser(Settings.settings());
         argParser.parse(args);
@@ -237,13 +240,11 @@ public class IbcTws {
         MainWindowManager.mainWindowManager().logDiagnosticMessage();
         ConfigDialogManager.configDialogManager().logDiagnosticMessage();
 
-        boolean isGateway = MainWindowManager.mainWindowManager().isGateway();
-
-        startCommandServer(isGateway);
-        startShutdownTimerIfRequired(isGateway);
+        startCommandServer();
+        startShutdownTimerIfRequired();
         createToolkitListener();
         startSavingTwsSettingsAutomatically();
-        startTwsOrGateway(isGateway);
+        startTwsOrGateway();
     }
 
     public static void printVersionInfo() {
@@ -327,15 +328,15 @@ public class IbcTws {
         }
     }
 
-    private static void startCommandServer(boolean isGateway) {
-        MyCachedThreadPool.getInstance().execute(new CommandServer(isGateway));
+    private static void startCommandServer() {
+        MyCachedThreadPool.getInstance().execute(new CommandServer());
     }
 
-    private static void startShutdownTimerIfRequired(boolean isGateway) {
+    private static void startShutdownTimerIfRequired() {
         Date shutdownTime = Settings.settings().shutdownTime();
         if (! (shutdownTime == null)) {
             long delay = shutdownTime.getTime() - System.currentTimeMillis();
-            Utils.logToConsole((isGateway ? "Gateway" : "TWS") +
+            Utils.logToConsole((Settings.settings().isGateway() ? "Gateway" : "TWS") +
                             " will be shut down at " +
                            (new SimpleDateFormat("yyyy/MM/dd HH:mm")).format(shutdownTime));
             MyScheduledExecutorService.getInstance().schedule(() -> {
@@ -359,10 +360,10 @@ public class IbcTws {
         }
     }
     
-    private static void startTwsOrGateway(boolean isGateway) {
+    private static void startTwsOrGateway() {
         Utils.logToConsole("TWS Settings directory is: " + getTWSSettingsDirectory());
         JtsIniManager.initialise(getJtsIniFilePath());
-        if (isGateway) {
+        if (Settings.settings().isGateway()) {
             startGateway();
         } else {
             startTws();
