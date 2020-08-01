@@ -31,7 +31,7 @@ class Agent {
             return true;
         }
 
-        if (! command.startsWith("install4j.jclient")) {
+        if (command.startsWith("install4j.jclient")) {
             return false;
         }
 
