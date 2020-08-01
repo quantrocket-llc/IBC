@@ -1,9 +1,6 @@
 target
-dist
 nbproject
 bin
 build
-makedocs/*/*.aux
-makedocs/*/*.log
-makedocs/*/*.tex
 .*
+IBZ.jar

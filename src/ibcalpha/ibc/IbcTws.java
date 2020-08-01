@@ -214,25 +214,9 @@ public class IbcTws {
         }
     }
 
-    public static void main(final String[] args) throws Exception {
-        Settings.settings().setIsGateway(false);
-        installExceptionHandler();
-        setupDefaultEnvironment(args);
-        initialize();
-        startTwsOrGateway();
-        startInitialTasks();
-    }
-    
-    static void setupDefaultEnvironment(final String[] args) throws Exception {
-        // Parse once to acquire settingsPath()
-        ArgumentParser argParser = new ArgumentParser(Settings.settings());
-        argParser.parse(args);
-
+    static void setupDefaultEnvironment() throws Exception {
         SettingsParser parser = new SettingsParser(Settings.settings());
-        parser.parse(argParser.settingsPath());
-
-        // Parse again to overwrite INI values with command line values.
-        argParser.parse(args);
+        parser.parse();
 
         Utils.initLogging();
     }
@@ -322,18 +306,6 @@ public class IbcTws {
         Utils.logRawToConsole("------------------------------------------------------------");
     }
     
-    private static void startGateway() {
-        String[] twsArgs = new String[1];
-        twsArgs[0] = getTWSSettingsDirectory();
-        try {
-            ibgateway.GWClient.main(twsArgs);
-        } catch (Throwable t) {
-            Utils.logError("Can't find the Gateway entry point: ibgateway.GWClient.main. Gateway is not correctly installed.");
-            t.printStackTrace(Utils.getErrStream());
-            Utils.exitWithError(ErrorCodes.ERROR_CODE_CANT_FIND_ENTRYPOINT);
-        }
-    }
-
     private static void startCommandServer() {
         MyCachedThreadPool.getInstance().execute(new CommandServer());
     }
@@ -348,29 +320,6 @@ public class IbcTws {
             MyScheduledExecutorService.getInstance().schedule(() -> {
                 MyCachedThreadPool.getInstance().execute(new StopTask(null));
             }, delay, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private static void startTws() {
-        if (Settings.settings().showAllTrades()) {
-            Utils.showTradesLogWindow();
-        }
-        String[] twsArgs = new String[1];
-        twsArgs[0] = getTWSSettingsDirectory();
-        try {
-            jclient.LoginFrame.main(twsArgs);
-        } catch (Throwable t) {
-            Utils.logError("Can't find the TWS entry point: jclient.LoginFrame.main; TWS is not correctly installed.");
-            t.printStackTrace(Utils.getErrStream());
-            Utils.exitWithError(ErrorCodes.ERROR_CODE_CANT_FIND_ENTRYPOINT);
-        }
-    }
-    
-    public static void startTwsOrGateway() {
-        if (Settings.settings().isGateway()) {
-            startGateway();
-        } else {
-            startTws();
         }
     }
 
@@ -391,5 +340,37 @@ public class IbcTws {
         TwsSettingsSaver.getInstance().initialise();
     }
 
-}
+    public static boolean isGateway() {
+        String command = System.getProperty("sun.java.command");
+        if (command.startsWith("install4j.ibgateway")) {
+            return true;
+        }
 
+        if (command.startsWith("install4j.jclient")) {
+            return false;
+        }
+
+        System.out.println("Unrecognized start class: ".concat(command));
+        //throw IllegalStateException(command);
+        return false;
+    }
+
+    public static void premain(String agentArgs) {
+        if (isGateway()) {
+            System.out.println("Running in gateway");
+        } else {
+            System.out.println("Running in TWS");
+        }
+
+        try {
+            Settings.settings().setIsGateway(isGateway());
+            installExceptionHandler();
+            setupDefaultEnvironment();
+            initialize();
+            startInitialTasks();
+        } catch (Exception e) {
+            System.out.println("Could not start: ".concat(e.toString()));
+            return;
+        }
+    }
+}

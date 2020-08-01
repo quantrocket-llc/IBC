@@ -28,22 +28,6 @@ import java.util.Properties;
 
 
 class PropertyParser {
-    private Properties props = new Properties();
-
-    public void load(String path) {
-        try {
-            File f = new File(path);
-            InputStream is = new BufferedInputStream(new FileInputStream(f));
-            props.load(is);
-            is.close();
-        } catch (FileNotFoundException e) {
-            Utils.logToConsole("Properties file " + path + " not found");
-        } catch (IOException e) {
-            Utils.logToConsole("Exception accessing Properties file " + path);
-            Utils.logToConsole(e.toString());
-        }
-    }
-
     /**
      * Returns the int value associated with property named key.
      *
@@ -55,7 +39,7 @@ class PropertyParser {
      * @return
      */
     public int getInt(String key, int defaultValue) {
-        String value = props.getProperty(key);
+        String value = System.getenv(key);
 
         // handle key missing or key=[empty string] in .ini file
         if (value == null || value.length() == 0) {
@@ -85,8 +69,8 @@ class PropertyParser {
      * @return
      */
     public String getString(String key, String defaultValue) {
-        String value = props.getProperty(key, defaultValue);
-        if (value.isEmpty()) {
+        String value = System.getenv(key);
+        if (value == null || value.isEmpty()) {
             return defaultValue;
         }
 
@@ -104,7 +88,7 @@ class PropertyParser {
      * @return
      */
     public boolean getBoolean(String key, boolean defaultValue) {
-        String value = props.getProperty(key);
+        String value = System.getenv(key);
 
         // handle key missing or key=[empty string] in .ini file
         if (value == null || value.length() == 0) {

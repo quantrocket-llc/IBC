@@ -30,11 +30,8 @@ public class SettingsParser {
         _settings = settings;
     }
 
-    public void parse(String path) {
-        Utils.logToConsole("Settings file is: " + path);
-
+    public void parse() {
         PropertyParser parser = new PropertyParser();
-        parser.load(path);
 
         _parseCommandServer(parser);
         _parseTwsSettings(parser);
@@ -50,67 +47,67 @@ public class SettingsParser {
             _settings.setIbDir(path);
         }
 
-        int port = parser.getInt("OverrideTwsApiPort", 0);
+        int port = parser.getInt("IBZ_OVERRIDE_TWS_API_PORT", 0);
         if (port != 0) {
             _settings.setOverrideTwsApiPort(port);
         }
 
-        if (! parser.getString("StoreSettingsOnServer", "").isEmpty()) {
-            boolean store = parser.getBoolean("StoreSettingsOnServer", false);
+        if (! parser.getString("IBZ_STORE_SETTINGS_ON_SERVER", "").isEmpty()) {
+            boolean store = parser.getBoolean("IBZ_STORE_SETTINGS_ON_SERVER", false);
             _settings.setStoreSettingsOnServer(store);
         }
 
-        if (! parser.getString("ReadOnlyApi", "").isEmpty()) {
-            boolean readonly = parser.getBoolean("ReadOnlyApi", true);
+        if (! parser.getString("IBZ_READONLY_API", "").isEmpty()) {
+            boolean readonly = parser.getBoolean("IBZ_READONLY_API", true);
             _settings.setReadonlyApi(readonly);
         }
 
-        String action = parser.getString("AcceptIncomingConnectionAction", "manual");
+        String action = parser.getString("IBZ_ACCEPT_INCOMING_CONNECTION", "manual");
         _settings.setIncomingConnectionPolicy(IncomingConnectionPolicy.fromString(action));
 
-        action = parser.getString("ExistingSessionDetectedAction", "manual");
+        action = parser.getString("IBZ_EXISTING_SESSION_ACTION", "manual");
         _settings.setExistingSessionPolicy(
             ExistingSessionPolicy.fromString(action)
         );
 
-        action = parser.getString("LogComponents", "never");
+        action = parser.getString("IBZ_LOG_COMPONENTS", "never");
         _settings.setComponentLogPolicy(ComponentLogPolicy.fromString(action));
 
-        path = parser.getString("LogOutputPath", "");
+        path = parser.getString("IBZ_LOG_OUTPUT_PATH", "");
         if (! path.equals("")) {
             _settings.setLogOutputPath(path);
         }
 
-        String time = parser.getString("ClosedownAt", "");
+        String time = parser.getString("IBZ_CLOSEDOWN_AT", "");
         if (! time.isEmpty()) {
             _settings.setShutdownTime(TimeParser.parse(time));
         }
 
-        _settings.setFixEnabled(parser.getBoolean("FIX", false));
-        _settings.setShowAllTrades(parser.getBoolean("ShowAllTrades", false));
+        _settings.setFixEnabled(parser.getBoolean("IBZ_FIX", false));
+        _settings.setShowAllTrades(parser.getBoolean("IBZ_SHOW_ALL_TRADES", false));
         _settings.setAcceptNonBrokerageAccountWarning(
-            parser.getBoolean("AcceptNonBrokerageAccountWarning", true));
-        _settings.setReadonlyLogin(parser.getBoolean("ReadOnlyLogin", false));
+            parser.getBoolean("IBZ_ACCEPT_NON_BROKERAGE_ACCOUNT_WARNING", true));
+        _settings.setReadonlyLogin(parser.getBoolean("IBZ_READONLY_LOGIN", false));
         _settings.setMinimizeMainWindow(
-            parser.getBoolean("MinimizeMainWindow", false));
+            parser.getBoolean("IBZ_MINIMIZE_MAIN_WINDOW", false));
         _settings.setMaximizeMainWindow(
-            parser.getBoolean("MaximizeMainWindow", false));
+            parser.getBoolean("IBZ_MAXIMIZE_MAIN_WINDOW", false));
         _settings.setAutoClosedown(
-            parser.getBoolean("IbAutoClosedown", false));
+            parser.getBoolean("IBZ_AUTO_CLOSEDOWN", false));
         _settings.setAllowBlindTrading(
-            parser.getBoolean("AllowBlindTrading", false));
+            parser.getBoolean("IBZ_ALLOW_BLIND_TRADING", false));
         _settings.setDismissPasswordExpiry(
-            parser.getBoolean("DismissPasswordExpiryWarning", false));
+            parser.getBoolean("IBZ_DISMISS_PASSWORD_EXPIRY_WARNING", false));
         _settings.setDismissNseCompliance(
-            parser.getBoolean("DismissNSEComplianceNotice", true));
+            parser.getBoolean("IBZ_DISMISS_NSE_COMPLIANCE_NOTICE", true));
         _settings.setSendTwsLogsToConsole(
-            parser.getBoolean("SendTWSLogsToConsole", false));
+            parser.getBoolean("IBZ_SEND_TWS_LOGS_TO_CONSOLE", false));
     }
 
     private void _parseTwsSaveSettingsAt(PropertyParser parser) {
         // setting format: SaveTwsSettingsAt=hh:mm [hh:mm]...
         //             or: SaveTwsSettingsAt=Every n [{mins | hours}] [hh:mm [hh:mm]]
-        String timesSetting = parser.getString("SaveTwsSettingsAt", "");
+        String timesSetting = parser.getString("IBZ_SAVE_TWS_SETTINGS_AT", "");
         if (timesSetting.isEmpty()) {
             return;
         }
@@ -124,33 +121,33 @@ public class SettingsParser {
 
     private void _parseCommandServer(PropertyParser parser)
     {
-        String commandPrompt = parser.getString("CommandPrompt", "");
+        String commandPrompt = parser.getString("IBZ_COMMAND_PROMPT", "");
         if (! commandPrompt.isEmpty()) {
             _settings.setCommandServerPrompt(commandPrompt);
         }
 
-        String bindAddress = parser.getString("BindAddress", "");
+        String bindAddress = parser.getString("IBZ_BIND_ADDRESS", "");
         if (! bindAddress.isEmpty()) {
             _settings.setCommandServerBindAddress(bindAddress);
         }
 
-        int port = parser.getInt("CommandServerPort", 0);
+        int port = parser.getInt("IBZ_COMMAND_SERVER_PORT", 0);
         if (port != 0) {
             _settings.setCommandServerPort(port);
         }
 
-        String controlFrom = parser.getString("ControlFrom", "");
+        String controlFrom = parser.getString("IBZ_CONTROL_FROM", "");
         if (! controlFrom.isEmpty()) {
             _settings.setCommandServerControlFrom(controlFrom);
         }
 
-        boolean suppress = parser.getBoolean("SuppressInfoMessages", true);
+        boolean suppress = parser.getBoolean("IBZ_SUPPRESS_INFO_MESSAGES", true);
         _settings.setSuppressInfoMessages(suppress);
     }
 
     private void _parseTradingMode(PropertyParser parser)
     {
-        String mode = parser.getString("TradingMode", "");
+        String mode = parser.getString("IBZ_TRADING_MODE", "live");
         if (! mode.isEmpty()) {
             Utils.logToConsole("Trading mode set from config: " + mode);
             _settings.setTradingMode(TradingMode.fromString(mode));
@@ -159,13 +156,13 @@ public class SettingsParser {
 
     private void _parseApiCredentials(PropertyParser parser)
     {
-        String ibLoginId = parser.getString("IbLoginId", "");
+        String ibLoginId = parser.getString("IBZ_LOGIN_ID", "");
         if (! ibLoginId.isEmpty()) {
             Utils.logToConsole("IB username set from config: " + ibLoginId);
             _settings.setIbLoginId(ibLoginId);
         }
 
-        String ibPassword = parser.getString("IbPassword", "");
+        String ibPassword = parser.getString("IBZ_PASSWORD", "");
         if (! ibPassword.isEmpty()) {
             Utils.logToConsole("IB password set from config");
             _settings.setIbPassword(ibPassword);
@@ -174,13 +171,13 @@ public class SettingsParser {
 
     private void _parseFixCredentials(PropertyParser parser)
     {
-        String fixLoginId = parser.getString("FIXLoginId", "");
+        String fixLoginId = parser.getString("IBZ_FIX_LOGIN_ID", "");
         if (! fixLoginId.isEmpty()) {
             Utils.logToConsole("FIXLoginId set from config: " + fixLoginId);
             _settings.setFixLoginId(fixLoginId);
         }
 
-        String fixPassword = parser.getString("FIXPassword", "");
+        String fixPassword = parser.getString("IBZ_FIX_PASSWORD", "");
         if (! fixPassword.isEmpty()) {
             Utils.logToConsole("FIXPassword set from config: " + fixPassword);
             _settings.setFixPassword(fixPassword);
