@@ -19,6 +19,9 @@
 package ibcalpha.ibc;
 
 import java.awt.Container;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,10 +38,10 @@ class Utils {
     
     static final SimpleDateFormat _DateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
     
-    // set these to the defaults, so that we can continue to use them 
-    // even when TWS redirects System.out and System.err to its own logfile
-    private static final PrintStream out = System.out;
-    private static final PrintStream err = System.err;
+    // Normally IBC logs to System.out and System.err, which are overridden by
+    // TWS to point to its own log file. When LogOutputPath setting is present,
+    // instead this points to the cutstom output file.
+    private static PrintStream _outputStream = null;
     
     /**
      * Performs a click on the menu item at the specified path, waiting if necessary for the
@@ -138,20 +141,43 @@ class Utils {
         }
         getOutStream().println(formatMessage(msg));
     }
-    
+
+    public static void initLogging() {
+        String path = Settings.settings().logOutputPath();
+        if (path == null) {
+            return;
+        }
+
+        logToConsole("Redirecting process logging to: %s", path);
+
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(path, true);
+        } catch (IOException e) {
+            logException(e);
+            return;
+        }
+
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        _outputStream = new PrintStream(bos, true);
+
+        System.setOut(_outputStream);
+        System.setErr(_outputStream);
+    }
+
     static PrintStream getErrStream() {
-        if (! Settings.settings().logToConsole()) {
-            return System.err;
+        if (_outputStream != null) {
+            return _outputStream;
         } else {
-            return err;
+            return System.err;
         }
     }
     
-    static PrintStream getOutStream() {
-        if (! Settings.settings().logToConsole()) {
-            return System.out;
+    public static PrintStream getOutStream() {
+        if (_outputStream != null) {
+            return _outputStream;
         } else {
-            return out;
+            return System.out;
         }
     }
     

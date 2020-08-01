@@ -76,6 +76,11 @@ public class SettingsParser {
         action = parser.getString("LogComponents", "never");
         _settings.setComponentLogPolicy(ComponentLogPolicy.fromString(action));
 
+        path = parser.getString("LogOutputPath", "");
+        if (! path.equals("")) {
+            _settings.setLogOutputPath(path);
+        }
+
         String time = parser.getString("ClosedownAt", "");
         if (! time.isEmpty()) {
             _settings.setShutdownTime(TimeParser.parse(time));
@@ -83,7 +88,6 @@ public class SettingsParser {
 
         _settings.setFixEnabled(parser.getBoolean("FIX", false));
         _settings.setShowAllTrades(parser.getBoolean("ShowAllTrades", false));
-        _settings.setLogToConsole(parser.getBoolean("LogToConsole", false));
         _settings.setAcceptNonBrokerageAccountWarning(
             parser.getBoolean("AcceptNonBrokerageAccountWarning", true));
         _settings.setReadonlyLogin(parser.getBoolean("ReadOnlyLogin", false));

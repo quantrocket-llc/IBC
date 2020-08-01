@@ -279,14 +279,14 @@ public class Settings {
     }
 
 
-    private boolean _logToConsole = false;
+    private String _logOutputPath = null;
 
-    public boolean logToConsole() {
-        return _logToConsole;
+    public String logOutputPath() {
+        return _logOutputPath;
     }
 
-    public void setLogToConsole(boolean logToConsole) {
-        _logToConsole = logToConsole;
+    public void setLogOutputPath(String logOutputPath) {
+        _logOutputPath = logOutputPath;
     }
 
 

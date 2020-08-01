@@ -19,7 +19,6 @@
 package ibcalpha.ibc;
 
 import java.io.OutputStreamWriter;
-import java.lang.System;
 
 import org.apache.logging.log4j.core.appender.WriterAppender;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -40,11 +39,11 @@ public class ConsoleRedirector {
             PatternLayout.newBuilder()
                 .withPattern("%d [%t] %p %c - %m%n")
                 .build(),
-            null,                                   // Filter
-            new OutputStreamWriter(System.out),     // Writer
-            "ConsoleLoggingAppender",               // name
-            false,                                  // follow
-            true                                    // ignore exceptions
+            null,                                           // Filter
+            new OutputStreamWriter(Utils.getOutStream()),   // Writer
+            "ConsoleLoggingAppender",                       // name
+            false,                                          // follow
+            true                                            // ignore exceptions
         );
         appender.start();
 

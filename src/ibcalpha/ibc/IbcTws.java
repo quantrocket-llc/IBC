@@ -233,6 +233,8 @@ public class IbcTws {
 
         // Parse again to overwrite INI values with command line values.
         argParser.parse(args);
+
+        Utils.initLogging();
     }
 
     public static void initialize() {
