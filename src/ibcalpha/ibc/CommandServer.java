@@ -126,6 +126,15 @@ class CommandServer
                 }
             }
 
+            if (!permitted) {
+                for (String listeningAddress : getAddresses().split(",")){
+                    if (listeningAddress.equals(socket.getInetAddress().getHostAddress())) {
+                        permitted = true;
+                        break;
+                    }
+                }
+            }
+
             if (permitted) {
                 Utils.logToConsole("CommandServer accepted connection from: " + socket.getInetAddress().toString());
                 return socket;
