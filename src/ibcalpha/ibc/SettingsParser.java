@@ -105,6 +105,8 @@ public class SettingsParser {
             parser.getBoolean("DismissNSEComplianceNotice", true));
         _settings.setSendTwsLogsToConsole(
             parser.getBoolean("SendTWSLogsToConsole", false));
+        _settings.setAutoRestart(
+            parser.getBoolean("AutoRestart", false));
     }
 
     private void _parseTwsSaveSettingsAt(PropertyParser parser) {

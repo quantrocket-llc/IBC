@@ -289,6 +289,7 @@ public class IbcTws {
         windowHandlers.add(new TradingLoginHandoffDialogHandler());
         windowHandlers.add(new ApiAnnouncementsDialogHandler());
         windowHandlers.add(new GettingStartedDialogHandler());
+        windowHandlers.add(new ConfirmAutoRestartDialogHandler());
         
         return windowHandlers;
     }
@@ -382,6 +383,14 @@ public class IbcTws {
             (new ConfigurationTask(
                 new ConfigureReadOnlyApiTask(
                     Settings.settings().readonlyApi().booleanValue()
+                )
+            )).executeAsync();
+        }
+
+        if (Settings.settings().autoRestart()) {
+            (new ConfigurationTask(
+                new ConfigureAutoRestartTask(
+                    Settings.settings().autoRestart()
                 )
             )).executeAsync();
         }

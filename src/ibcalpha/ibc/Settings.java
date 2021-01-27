@@ -377,6 +377,15 @@ public class Settings {
         _sendTwsLogsToConsole = send;
     }
 
+    private boolean _autoRestart = false;
+
+    public boolean autoRestart() {
+        return _autoRestart;
+    }
+
+    public void setAutoRestart(boolean autoRestart) {
+        _autoRestart = autoRestart;
+    }
 
     private boolean _maximizeMainWindow = false;
 
