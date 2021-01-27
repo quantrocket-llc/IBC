@@ -23,29 +23,29 @@ import java.io.File;
 
 /**
  * Allowable parameter combinations:
- * 
+ *
  * 1. No parameters
- * 
+ *
  * 2. <iniFile> [<tradingMode>]
- * 
+ *
  * 3. <iniFile> <apiUserName> <apiPassword> [<tradingMode>]
- * 
+ *
  * 4. <iniFile> <fixUserName> <fixPassword> <apiUserName> <apiPassword> [<tradingMode>]
- * 
+ *
  * where:
- * 
- *      <iniFile>       ::= NULL | path-and-filename-of-.ini-file 
- * 
+ *
+ *      <iniFile>       ::= NULL | path-and-filename-of-.ini-file
+ *
  *      <tradingMode>   ::= blank | LIVETRADING | PAPERTRADING
- * 
+ *
  *      <apiUserName>   ::= blank | username-for-TWS
- * 
+ *
  *      <apiPassword>   ::= blank | password-for-TWS
- * 
+ *
  *      <fixUserName>   ::= blank | username-for-FIX-CTCI-Gateway
- * 
+ *
  *      <fixPassword>   ::= blank | password-for-FIX-CTCI-Gateway
- * 
+ *
  */
 public class ArgumentParser {
     private Settings _settings;

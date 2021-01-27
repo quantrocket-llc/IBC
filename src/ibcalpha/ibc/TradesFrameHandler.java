@@ -27,11 +27,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class TradesFrameHandler implements WindowHandler {
-    
+
     boolean firstTradesWindowOpened;
-    
+
     boolean showAllTrades;
-    
+
     @Override
     public boolean filterEvent(Window window, int eventId) {
         switch (eventId) {
@@ -76,19 +76,19 @@ public class TradesFrameHandler implements WindowHandler {
             } else {
                 Utils.logToConsole("Can't set trades log to show all trades with this TWS version: user must do this");
                 /*
-                 * For TWS 955 onwards, IB have replaced the row of daily 
+                 * For TWS 955 onwards, IB have replaced the row of daily
                  * checkboxes with what appears visually to be a combo box:
                  * it is indeed derived from a JComboBox, but setting the
                  * selected item to 'Last 7 Days' doesn't have the desired
                  * effect.
-                 * 
-                 * At present I don't see a way of getting round this, but 
+                 *
+                 * At present I don't see a way of getting round this, but
                  * the setting chosen by the user can now be persisted
                  * between sessions, so there is really no longer a need for
                  * 'ShowAllTrades'.
-                 * 
+                 *
                  */
-                
+
                 showAllTrades = false;
                 ((JFrame) window).dispose();
             }

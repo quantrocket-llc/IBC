@@ -40,8 +40,8 @@ class GetMainWindowTask implements Callable<JFrame>{
             lock.unlock();
         }
         return mMainWindow;
-    }  
-    
+    }
+
     void setMainWindow(JFrame window) {
         lock.lock();
         try {

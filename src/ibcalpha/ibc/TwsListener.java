@@ -42,7 +42,7 @@ class TwsListener implements AWTEventListener {
         if (eventID == WindowEvent.WINDOW_OPENED ||
                 eventID == WindowEvent.WINDOW_ACTIVATED ||
                 eventID == WindowEvent.WINDOW_CLOSING ||
-                eventID == WindowEvent.WINDOW_CLOSED || 
+                eventID == WindowEvent.WINDOW_CLOSED ||
                 eventID == WindowEvent.WINDOW_ICONIFIED ||
                 eventID == WindowEvent.WINDOW_DEICONIFIED) {
             logWindow(window, eventID);

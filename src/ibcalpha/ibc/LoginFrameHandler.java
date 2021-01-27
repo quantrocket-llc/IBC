@@ -30,8 +30,8 @@ final class LoginFrameHandler extends AbstractLoginHandler {
     public boolean recogniseWindow(Window window) {
         if (! (window instanceof JFrame)) return false;
 
-        // we check for the presence of the Login button because 
-        // TWS displays a different (information-only) dialog, also 
+        // we check for the presence of the Login button because
+        // TWS displays a different (information-only) dialog, also
         // entitled Login, when it's trying to reconnect
         return ((SwingUtils.titleEquals(window, "New Login") ||
                 SwingUtils.titleEquals(window, "Login")) &&
@@ -45,16 +45,16 @@ final class LoginFrameHandler extends AbstractLoginHandler {
         setTradingMode(window);
 
         JtsIniManager.reload();     // because TWS/Gateway modify the jts.ini file before this point
-        
+
         final JTextField userName = SwingUtils.findTextField(window, 0);
         if (userName == null) throw new IbcException("Username field");
-        
-        // Add a DocumentListener to the username field, which will set the 
+
+        // Add a DocumentListener to the username field, which will set the
         // "Use/store settings on server" checkbox as required. This is
         // necessary because when a valid username is entered, TWS sets the
         // checkbox according to the latest saved settings for that user, which
         // may not be what is now required by the StoreSettingsOnServer setting.
-        userName.getDocument().addDocumentListener(new DocumentListener(){ 
+        userName.getDocument().addDocumentListener(new DocumentListener(){
             @Override
             public void insertUpdate(DocumentEvent de) {
                 setStoreSettingsOnServerCheckbox();
@@ -75,7 +75,7 @@ final class LoginFrameHandler extends AbstractLoginHandler {
                 if(store != null) {
                     final String STORE_SETTINGS_ON_SERVER_CHECKBOX = "Use/store settings on server";
 
-                    // we defer setting the checkbox: if we do it inline, TWS's setting 
+                    // we defer setting the checkbox: if we do it inline, TWS's setting
                     // overwrites it
                     GuiDeferredExecutor.instance().execute(() -> {
                         if (! SwingUtils.setCheckBoxSelected(
@@ -92,7 +92,7 @@ final class LoginFrameHandler extends AbstractLoginHandler {
         });
         return true;
     }
-    
+
     @Override
     protected final boolean preLogin(final Window window, int eventID) throws IbcException {
         if (Settings.settings().ibLoginId().length() == 0) {
@@ -104,7 +104,7 @@ final class LoginFrameHandler extends AbstractLoginHandler {
         }
         return false;
     }
-    
+
     @Override
     protected final boolean setFields(Window window, int eventID) throws IbcException {
         Utils.logToConsole("Setting user name");
@@ -113,6 +113,6 @@ final class LoginFrameHandler extends AbstractLoginHandler {
         setCredential(window, "IBAPI password", 1, Settings.settings().ibPassword());
         return true;
     }
-    
+
 }
 

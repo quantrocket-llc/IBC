@@ -38,22 +38,22 @@ class GetConfigDialogTask implements Callable<JDialog>{
     @Override
     public JDialog call() throws IbcException, InterruptedException {
         final JFrame mainForm = MainWindowManager.mainWindowManager().getMainWindow();
-        
+
         if (Settings.settings().isGateway()) {
             /*
              * For the gateway, the main form is loaded right at the start, and long before
              * the menu items become responsive: any attempt to access the Configure > Settings
              * menu item (even after it has been enabled) results in an exception being logged
-             * by TWS. 
-             * 
+             * by TWS.
+             *
              * It's not obvious how long we need to wait before the menu becomes responsive. However the splash
              * frame that appears in front of the gateway main window during initialisation disappears when everything
              * is ready, and its close can be detected as a frame entitled 'Starting application...' and a Closed event.
-             * 
+             *
              * So we wait for the handler for that frame to call setSplashScreenClosed().
-             * 
+             *
              */
-            
+
             lock.lock();
             try {
                 while (!mGatewayInitialised) {
@@ -63,7 +63,7 @@ class GetConfigDialogTask implements Callable<JDialog>{
                 lock.unlock();
             }
         }
-        
+
         if (Settings.settings().isGateway()) {
             if (!Utils.invokeMenuItem(mainForm, new String[] {"Configure", "Settings"})) throw new IbcException("'Configure > Settings' menu item");
         } else if (Utils.invokeMenuItem(mainForm, new String[] {"Edit", "Global Configuration..."})) /* TWS's Classic layout */ {
@@ -71,7 +71,7 @@ class GetConfigDialogTask implements Callable<JDialog>{
         } else {
             throw new IbcException("'Edit > Global Configuration' or 'File > Global Configuration' menu items");
         }
-        
+
         lock.lock();
         try {
             while (mConfigDialog == null) {
@@ -81,7 +81,7 @@ class GetConfigDialogTask implements Callable<JDialog>{
             lock.unlock();
         }
         return mConfigDialog;
-    }  
+    }
 
     void setConfigDialog(JDialog configDialog) {
         lock.lock();
@@ -92,7 +92,7 @@ class GetConfigDialogTask implements Callable<JDialog>{
             lock.unlock();
         }
     }
-    
+
     void setSplashScreenClosed() {
         if (! Settings.settings().isGateway()) return;
         lock.lock();

@@ -26,7 +26,7 @@ import java.util.Date;
 import javax.swing.JFrame;
 
 class ExitSessionFrameHandler implements WindowHandler {
-    
+
     private JFrame exitSessionFrame = null;
 
     public boolean filterEvent(Window window, int eventId) {
@@ -57,7 +57,7 @@ class ExitSessionFrameHandler implements WindowHandler {
         if (! (window instanceof JFrame))  return false;
 
         return (SwingUtils.titleContains(window, "Exit Session Setting")  ||
-                    SwingUtils.titleContains(window, "Session-Exit-Einstellung") || 
+                    SwingUtils.titleContains(window, "Session-Exit-Einstellung") ||
                     exitSessionFrame == (JFrame)window);
     }
 

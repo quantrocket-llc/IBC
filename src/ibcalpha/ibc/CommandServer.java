@@ -110,8 +110,8 @@ class CommandServer
 
             final String allowedAddresses = Settings.settings().commandServerControlFrom();
             Utils.logToConsole("CommandServer: ControlFrom setting = " + allowedAddresses);
-            
-            boolean permitted = false; 
+
+            boolean permitted = false;
             if (socket.getInetAddress().getHostAddress().equals(mSocket.getInetAddress().getHostAddress())) {
                 permitted = true;
             } else if (socket.getInetAddress().getHostAddress().equals(InetAddress.getLoopbackAddress().getHostAddress())) {
@@ -138,7 +138,7 @@ class CommandServer
             if (permitted) {
                 Utils.logToConsole("CommandServer accepted connection from: " + socket.getInetAddress().toString());
                 return socket;
-            } 
+            }
 
             // access denied
             Utils.logToConsole("CommandServer denied access to: " +
@@ -153,7 +153,7 @@ class CommandServer
             return null;
         }
     }
-    
+
     private String getAddresses() {
         final List<String> addressList = getAddressList();
         String s = addressList.isEmpty() ? "" : addressList.get(0);
@@ -162,9 +162,9 @@ class CommandServer
         }
         return s;
     }
-    
+
     private List<String> getAddressList() {
-        List<String> addressList = new ArrayList<>(); 
+        List<String> addressList = new ArrayList<>();
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {

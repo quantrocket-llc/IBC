@@ -134,7 +134,7 @@ class CommandDispatcher
         jf.dispatchEvent(pressed);
         jf.dispatchEvent(typed);
         jf.dispatchEvent(released);
-      
+
         mChannel.writeAck("");
    }
 
@@ -155,5 +155,5 @@ class CommandDispatcher
     private void handleStopCommand() {
         (new StopTask(mChannel)).run();     // run on the current thread
     }
-    
+
 }

@@ -43,7 +43,7 @@ import javax.swing.MenuElement;
 import javax.swing.tree.TreeModel;
 
 class SwingUtils {
-    
+
     static final String NEWLINE = System.lineSeparator();
 
     /**
@@ -298,7 +298,7 @@ class SwingUtils {
 
     /**
      * Traverses a container hierarchy and returns the JMenuItem with
-     * the given path from the first JMenuBar encountered, or null if the 
+     * the given path from the first JMenuBar encountered, or null if the
      * first JMenuBar doesn't contain an item with that path
      *
      * @param container
@@ -418,7 +418,7 @@ class SwingUtils {
         }
         return null;
     }
-    
+
     /**
      * Indicates whether the specified JButton is enabled.
      * @param window
@@ -470,10 +470,10 @@ class SwingUtils {
         return rb.isSelected();
 
     }
-    
+
 /**
      * Returns a string representing the structure of the specified window.
-     * 
+     *
      * Details of each component in the window are included, indented to reflect
      * the component's position in the hierarchy.
      * @param window
@@ -486,7 +486,7 @@ class SwingUtils {
         builder.append(NEWLINE);
         return builder.toString();
     }
-    
+
     /**
      * Sets or clears the specified JCheckBox.
      * @param window
@@ -504,13 +504,13 @@ class SwingUtils {
         cb.setSelected(value);
         return true;
     }
-    
+
     /**
      * Sets or clears the specified JRadioButton .
      * @param window
-     * the window in which to search for the required JRadioButton 
+     * the window in which to search for the required JRadioButton
      * @param buttonText
-     * the label for the required JRadioButton 
+     * the label for the required JRadioButton
      * @param value
      * true to set the JRadioButton ; false to clear it
      * @return
@@ -577,7 +577,7 @@ class SwingUtils {
     }
 
     static String windowEventToString(int eventID) {
-        switch (eventID) { 
+        switch (eventID) {
             case WindowEvent.WINDOW_ACTIVATED:
                 return "Activated";
             case WindowEvent.WINDOW_CLOSED:
@@ -612,24 +612,24 @@ class SwingUtils {
         }
         return title;
     }
-    
+
     private static String getComponentDetails(Component component) {
         String s = component.isEnabled() ? "" : "[Disabled]";
         if (component instanceof JButton) {
-            s += "JButton: "; 
+            s += "JButton: ";
             s += ((JButton)component).getText();
         } else if (component instanceof JCheckBox) {
             s += "JCheckBox: ";
             s += ((JCheckBox) component).getText();
             s += "(" + (((JCheckBox) component).isSelected() ? "selected" : "unselected") + ")";
         } else if (component instanceof JLabel) {
-            s += "JLabel: "; 
+            s += "JLabel: ";
             s += ((JLabel) component).getText();
         } else if (component instanceof JOptionPane) {
             s += "JOptionPane: ";
             s += ((JOptionPane) component).getMessage().toString();
         }else if (component instanceof JRadioButton) {
-            s += "JRadioButton: "; 
+            s += "JRadioButton: ";
             s += ((JRadioButton) component).getText();
         } else if (component instanceof JPasswordField) {
             s += "JPasswordField: ";
@@ -638,7 +638,7 @@ class SwingUtils {
             s += "JTextField: ";
             s += ((JTextField) component).getText();
         } else if (component instanceof JMenuBar) {
-            s += "JMenuBar: "; 
+            s += "JMenuBar: ";
             s += ((JMenuBar) component).getName();
         } else if (component instanceof JMenuItem) {
             s += "JMenuItem: ";
@@ -658,7 +658,7 @@ class SwingUtils {
         }
         return s;
     }
-    
+
     private static String getClassDerivation(Object object) {
         String s = object.getClass().getSimpleName();
         Class<?> c = object.getClass().getSuperclass();
@@ -672,7 +672,7 @@ class SwingUtils {
     private static void appendComponentStructure(Component component, StringBuilder builder) {
         appendComponentStructure(component, builder, "");
     }
-    
+
     private static void appendComponentStructure(Component component, StringBuilder builder, String indent) {
         builder.append(NEWLINE);
         builder.append(indent);
@@ -724,7 +724,7 @@ class SwingUtils {
             builder.append("--------");
         }
     }
-    
+
     private static void appendMenuSubElements(MenuElement element, StringBuilder builder, String indent) {
         for (MenuElement subItem : element.getSubElements()) {
             appendMenuItem((Component)subItem, builder, indent);

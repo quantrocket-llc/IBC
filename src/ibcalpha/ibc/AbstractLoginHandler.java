@@ -25,7 +25,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
 public abstract class AbstractLoginHandler implements WindowHandler {
-    
+
     @Override
     public boolean filterEvent(Window window, int eventId) {
         switch (eventId) {
@@ -50,10 +50,10 @@ public abstract class AbstractLoginHandler implements WindowHandler {
             Utils.exitWithError(ErrorCodes.ERROR_CODE_CANT_FIND_CONTROL, "could not login: could not find control: " + e.getMessage());
         }
     }
-    
+
     @Override
     public abstract boolean recogniseWindow(Window window);
-    
+
     private void doLogin(final Window window) throws IbcException {
         JButton b = findLoginButton(window);
 
@@ -61,13 +61,13 @@ public abstract class AbstractLoginHandler implements WindowHandler {
             SwingUtils.clickButton(window, b.getText());
         });
     }
-    
+
     protected abstract boolean initialise(final Window window, int eventID) throws IbcException;
-    
+
     protected abstract boolean preLogin(final Window window, int eventID) throws IbcException;
-    
+
     protected abstract boolean setFields(Window window, int eventID) throws IbcException;
-    
+
     private JButton findLoginButton(Window window) {
         JButton b = SwingUtils.findButton(window, "Login");
         if (b == null) b = SwingUtils.findButton(window, "Log In");
@@ -79,17 +79,17 @@ public abstract class AbstractLoginHandler implements WindowHandler {
         SwingUtils.findTextField(window, credentialIndex).requestFocus();
     }
 
-    protected final void setCredential(final Window window, 
+    protected final void setCredential(final Window window,
                                             final String credentialName,
-                                            final int credentialIndex, 
+                                            final int credentialIndex,
                                             final String value) throws IbcException {
         if (! SwingUtils.setTextField(window, credentialIndex, value)) throw new IbcException(credentialName);
     }
-    
+
     protected final void setTradingMode(final Window window) {
         TradingMode tradingMode = Settings.settings().tradingMode();
 
-        if (SwingUtils.findToggleButton(window, "Live Trading") != null && 
+        if (SwingUtils.findToggleButton(window, "Live Trading") != null &&
                 SwingUtils.findToggleButton(window, "Paper Trading") != null) {
             // TWS 974 onwards uses toggle buttons rather than a combo box
             Utils.logToConsole("Setting Trading mode = " + tradingMode.toString());

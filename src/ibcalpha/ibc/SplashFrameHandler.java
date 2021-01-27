@@ -30,9 +30,9 @@ public class SplashFrameHandler implements WindowHandler {
          * Note that we are only interested in the closing of the gateway splash
          * frame, because that indicates that the gateway is now in a position to
          * start handling menu commands.
-         * 
-         * Note also that the splash frame's window title is repeatedly changed during 
-         * gateway initialisation, and it's only the last title value that we use for 
+         *
+         * Note also that the splash frame's window title is repeatedly changed during
+         * gateway initialisation, and it's only the last title value that we use for
          * recognising it
          */
         switch (eventId) {
@@ -56,5 +56,5 @@ public class SplashFrameHandler implements WindowHandler {
 
         return (SwingUtils.titleContains(window, "Starting application..."));
     }
-    
+
 }

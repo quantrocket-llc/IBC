@@ -35,21 +35,21 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 class Utils {
-    
+
     static final SimpleDateFormat _DateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-    
+
     // Normally IBC logs to System.out and System.err, which are overridden by
     // TWS to point to its own log file. When LogOutputPath setting is present,
     // instead this points to the cutstom output file.
     private static PrintStream _outputStream = null;
-    
+
     /**
      * Performs a click on the menu item at the specified path, waiting if necessary for the
      * menu item to become enabled.
-     * 
+     *
      * If there is more than one menu bar within the specified container, they are searched
      * (in hierarchical containment order) until one is found that contains the specified menu item.
-     * 
+     *
      * Note that this method may block the calling thread if the required menu item is currently disabled.
      * @param container
      * the Container to search in
@@ -57,7 +57,7 @@ class Utils {
      * the path of the required menu item
      * @return
      * true if the menu item was successfully clicked; false if the menu item could not be found
-     * @throws  IllegalStateException 
+     * @throws  IllegalStateException
      * the method has been called on the Swing event dispatch thread
      */
     static boolean invokeMenuItem(final Container container, final String[] path) throws IllegalStateException {
@@ -66,7 +66,7 @@ class Utils {
             FutureTask<Boolean> task = new FutureTask<>(() -> {
                 String s = path[0];
                 for (int i = 1; i < path.length; i++) s = s + " > " + path[i];
-                
+
                 JMenuItem menuItem = SwingUtils.findMenuItemInAnyMenuBar(container, path);
                 if (menuItem == null) throw new IbcException("menu item: " + s);
                 if (!menuItem.isEnabled()) return false;
@@ -75,7 +75,7 @@ class Utils {
             });
 
             GuiDeferredExecutor.instance().execute(task);
-            
+
             try {
                 if (task.get()) return true;
             } catch (InterruptedException e) {
@@ -89,7 +89,7 @@ class Utils {
                 if (t instanceof RuntimeException) throw (RuntimeException)t;
                 if (t instanceof Error) throw (Error)t;
             }
-            
+
             pause(250);
         }
     }
@@ -97,30 +97,30 @@ class Utils {
     static void exitWithError(int errorCode) {
         System.exit(errorCode);
     }
-    
+
     static void exitWithError(int errorCode, String message) {
         logError(message);
         exitWithError(errorCode);
     }
-    
+
     static void exitWithException(int errorCode, Throwable t) {
         logException(t);
         exitWithError(errorCode);
     }
-    
+
     static void logError(String message) {
         getErrStream().println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         getErrStream().println(formatMessage(message));
         getErrStream().println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
-    
+
     static void logException(Throwable t) {
         getErrStream().println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         getErrStream().println(formatMessage("An exception has occurred:"));
         t.printStackTrace(getErrStream());
         getErrStream().println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
-    
+
     /**
      * Writes a plain one-line text message to the console.
      * @param msg
@@ -129,7 +129,7 @@ class Utils {
     static void logRawToConsole(String msg) {
         getOutStream().println(msg);
     }
-    
+
     /**
      * Writes a text message prefixed with the current time to the console.
      * @param msg
@@ -172,7 +172,7 @@ class Utils {
             return System.err;
         }
     }
-    
+
     public static PrintStream getOutStream() {
         if (_outputStream != null) {
             return _outputStream;
@@ -180,14 +180,14 @@ class Utils {
             return System.out;
         }
     }
-    
+
     private static String formatMessage(String message) {
         return _DateFormatter.format(new Date()) + " IBC: " + message.substring(0,1).toUpperCase() + message.substring(1);
     }
 
     /**
      * sleeps for millis milliseconds, approximately.
-     * 
+     *
      * Note that this method swallows the InterruptedException that may
      * result from a call to sleep().
      * @param millis
@@ -199,7 +199,7 @@ class Utils {
         } catch (InterruptedException ie) {
         }
     }
-    
+
     /**
      * Selects the specified section in the Global Configuration dialog.
      * @param configDialog
@@ -215,7 +215,7 @@ class Utils {
      */
     static boolean selectConfigSection(final JDialog configDialog, final String[] path) throws IbcException, IllegalStateException {
         if (!SwingUtilities.isEventDispatchThread()) throw new IllegalStateException("selectConfigSection must be run on the event dispatch thread");
-        
+
         JTree configTree = SwingUtils.findTree(configDialog);
         if (configTree == null) throw new IbcException("could not find the config tree in the Global Configuration dialog");
 
