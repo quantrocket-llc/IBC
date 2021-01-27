@@ -85,10 +85,18 @@ public class ArgumentParser {
 
     private void _setApiCredentials(String loginId, String password) {
         if (! loginId.isEmpty()) {
+            if (loginId.startsWith("${") && loginId.endsWith("}")) {
+                String loginVarname =  loginId.substring(2, loginId.length() - 1);
+                loginId = System.getenv(loginVarname);
+            }
             Utils.logToConsole("IB username set from arguments: " + loginId);
             _settings.setIbLoginId(loginId);
         }
         if (! password.isEmpty()) {
+            if (password.startsWith("${") && password.endsWith("}")) {
+                String passwordVarname = password.substring(2, password.length() - 1);
+                password = System.getenv(passwordVarname);
+            }
             Utils.logToConsole("IB password set from arguments");
             _settings.setIbPassword(password);
         }
@@ -96,16 +104,28 @@ public class ArgumentParser {
 
     private void _setFixCredentials(String loginId, String password) {
         if (! loginId.isEmpty()) {
+            if (loginId.startsWith("${") && loginId.endsWith("}")) {
+                String loginIdVarname = loginId.substring(2, loginId.length() - 1);
+                loginId = System.getenv(loginIdVarname);
+            }
             Utils.logToConsole("FIX username set from arguments: " + loginId);
             _settings.setFixLoginId(loginId);
         }
         if (! password.isEmpty()) {
+            if (password.startsWith("${") && password.endsWith("}")) {
+                String passwordVarname = password.substring(2, password.length() - 1);
+                password = System.getenv(passwordVarname);
+            }
             Utils.logToConsole("FIX password set from arguments");
             _settings.setFixPassword(password);
         }
     }
 
     private void _setTradingMode(String mode) {
+        if (mode.startsWith("${") && mode.endsWith("}")) {
+            String modeVarname = mode.substring(2, mode.length() - 1);
+            mode = System.getenv(modeVarname);
+        }
         Utils.logToConsole("Trading mode set from arguments: " + mode);
         _settings.setTradingMode(TradingMode.fromString(mode));
     }
