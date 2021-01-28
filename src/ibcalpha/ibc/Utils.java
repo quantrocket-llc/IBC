@@ -242,10 +242,4 @@ class Utils {
     static void selectLockAndExitSettings(final JDialog configDialog) throws IbcException, IllegalStateException {
             Utils.selectConfigSection(configDialog, new String[] {"Lock and Exit"});
     }
-
-    static void showTradesLogWindow() {
-            MyCachedThreadPool.getInstance().execute(new Runnable () {
-                @Override public void run() {invokeMenuItem(MainWindowManager.mainWindowManager().getMainWindow(), new String[] {"Account", "Trade Log"});}
-            });
-    }
 }

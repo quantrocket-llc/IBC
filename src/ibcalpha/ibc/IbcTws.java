@@ -245,7 +245,6 @@ public class IbcTws {
         ConfigDialogManager.configDialogManager().logDiagnosticMessage();
 
         startCommandServer();
-        startShutdownTimerIfRequired();
         createToolkitListener();
         startSavingTwsSettingsAutomatically();
 
@@ -266,7 +265,6 @@ public class IbcTws {
 
         windowHandlers.add(new AcceptIncomingConnectionDialogHandler());
         windowHandlers.add(new BlindTradingWarningDialogHandler());
-        windowHandlers.add(new ExitSessionFrameHandler());
         windowHandlers.add(new LoginFrameHandler());
         windowHandlers.add(new GatewayLoginFrameHandler());
         windowHandlers.add(new MainWindowFrameHandler());
@@ -278,7 +276,6 @@ public class IbcTws {
         windowHandlers.add(new NSEComplianceFrameHandler());
         windowHandlers.add(new PasswordExpiryWarningFrameHandler());
         windowHandlers.add(new GlobalConfigurationDialogHandler());
-        windowHandlers.add(new TradesFrameHandler());
         windowHandlers.add(new ExistingSessionDetectedDialogHandler());
         windowHandlers.add(new ApiChangeConfirmationDialogHandler());
         windowHandlers.add(new SplashFrameHandler());
@@ -339,23 +336,7 @@ public class IbcTws {
         MyCachedThreadPool.getInstance().execute(new CommandServer());
     }
 
-    private static void startShutdownTimerIfRequired() {
-        Date shutdownTime = Settings.settings().shutdownTime();
-        if (! (shutdownTime == null)) {
-            long delay = shutdownTime.getTime() - System.currentTimeMillis();
-            Utils.logToConsole((Settings.settings().isGateway() ? "Gateway" : "TWS") +
-                            " will be shut down at " +
-                           (new SimpleDateFormat("yyyy/MM/dd HH:mm")).format(shutdownTime));
-            MyScheduledExecutorService.getInstance().schedule(() -> {
-                MyCachedThreadPool.getInstance().execute(new StopTask(null));
-            }, delay, TimeUnit.MILLISECONDS);
-        }
-    }
-
     private static void startTws() {
-        if (Settings.settings().showAllTrades()) {
-            Utils.showTradesLogWindow();
-        }
         String[] twsArgs = new String[1];
         twsArgs[0] = getTWSSettingsDirectory();
         try {

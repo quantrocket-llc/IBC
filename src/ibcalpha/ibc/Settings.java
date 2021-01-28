@@ -234,18 +234,6 @@ public class Settings {
         _componentLogPolicy = policy;
     }
 
-
-    private Date _shutdownTime = null;
-
-    public Date shutdownTime() {
-        return _shutdownTime;
-    }
-
-    public void setShutdownTime(Date shutdownTime) {
-        _shutdownTime = shutdownTime;
-    }
-
-
     private String _ibDir = System.getProperty("user.dir");
 
     public String ibDir() {
@@ -266,18 +254,6 @@ public class Settings {
     public void setReadonlyApi(boolean readonlyApi) {
         _readonlyApi = Boolean.valueOf(readonlyApi);
     }
-
-
-    private boolean _showAllTrades = false;
-
-    public boolean showAllTrades() {
-        return _showAllTrades;
-    }
-
-    public void setShowAllTrades(boolean showAllTrades) {
-        _showAllTrades = showAllTrades;
-    }
-
 
     private String _logOutputPath = null;
 
@@ -321,18 +297,6 @@ public class Settings {
     public void setReadonlyLogin(boolean readonlyLogin) {
         _readonlyLogin = readonlyLogin;
     }
-
-
-    private boolean _autoClosedown = false;
-
-    public boolean autoClosedown() {
-        return _autoClosedown;
-    }
-
-    public void setAutoClosedown(boolean autoClosedown) {
-        _autoClosedown = autoClosedown;
-    }
-
 
     private boolean _allowBlindTrading = false;
 

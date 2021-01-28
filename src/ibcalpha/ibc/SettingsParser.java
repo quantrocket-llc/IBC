@@ -39,9 +39,6 @@ public class SettingsParser {
         _parseCommandServer(parser);
         _parseTwsSettings(parser);
         _parseTwsSaveSettingsAt(parser);
-        _parseTradingMode(parser);
-        _parseApiCredentials(parser);
-        _parseFixCredentials(parser);
     }
 
     private void _parseTwsSettings(PropertyParser parser) {
@@ -81,13 +78,7 @@ public class SettingsParser {
             _settings.setLogOutputPath(path);
         }
 
-        String time = parser.getString("ClosedownAt", "");
-        if (! time.isEmpty()) {
-            _settings.setShutdownTime(TimeParser.parse(time));
-        }
-
         _settings.setFixEnabled(parser.getBoolean("FIX", false));
-        _settings.setShowAllTrades(parser.getBoolean("ShowAllTrades", false));
         _settings.setAcceptNonBrokerageAccountWarning(
             parser.getBoolean("AcceptNonBrokerageAccountWarning", true));
         _settings.setReadonlyLogin(parser.getBoolean("ReadOnlyLogin", false));
@@ -95,8 +86,6 @@ public class SettingsParser {
             parser.getBoolean("MinimizeMainWindow", false));
         _settings.setMaximizeMainWindow(
             parser.getBoolean("MaximizeMainWindow", false));
-        _settings.setAutoClosedown(
-            parser.getBoolean("IbAutoClosedown", false));
         _settings.setAllowBlindTrading(
             parser.getBoolean("AllowBlindTrading", false));
         _settings.setDismissPasswordExpiry(
@@ -148,44 +137,5 @@ public class SettingsParser {
 
         boolean suppress = parser.getBoolean("SuppressInfoMessages", true);
         _settings.setSuppressInfoMessages(suppress);
-    }
-
-    private void _parseTradingMode(PropertyParser parser)
-    {
-        String mode = parser.getString("TradingMode", "");
-        if (! mode.isEmpty()) {
-            Utils.logToConsole("Trading mode set from config: " + mode);
-            _settings.setTradingMode(TradingMode.fromString(mode));
-        }
-    }
-
-    private void _parseApiCredentials(PropertyParser parser)
-    {
-        String ibLoginId = parser.getString("IbLoginId", "");
-        if (! ibLoginId.isEmpty()) {
-            Utils.logToConsole("IB username set from config: " + ibLoginId);
-            _settings.setIbLoginId(ibLoginId);
-        }
-
-        String ibPassword = parser.getString("IbPassword", "");
-        if (! ibPassword.isEmpty()) {
-            Utils.logToConsole("IB password set from config");
-            _settings.setIbPassword(ibPassword);
-        }
-    }
-
-    private void _parseFixCredentials(PropertyParser parser)
-    {
-        String fixLoginId = parser.getString("FIXLoginId", "");
-        if (! fixLoginId.isEmpty()) {
-            Utils.logToConsole("FIXLoginId set from config: " + fixLoginId);
-            _settings.setFixLoginId(fixLoginId);
-        }
-
-        String fixPassword = parser.getString("FIXPassword", "");
-        if (! fixPassword.isEmpty()) {
-            Utils.logToConsole("FIXPassword set from config: " + fixPassword);
-            _settings.setFixPassword(fixPassword);
-        }
     }
 }
