@@ -368,7 +368,23 @@ public class IbcTws {
             )).executeAsync();
         }
 
-        if (Settings.settings().autoRestart()) {
+        if (Settings.settings().masterApiClientId() != null) {
+            (new ConfigurationTask(
+                new ConfigureMasterApiClientIdTask(
+                    Settings.settings().masterApiClientId()
+                )
+            )).executeAsync();
+        }
+
+        if (Settings.settings().exposeEntireTradingSchedule() != null) {
+            (new ConfigurationTask(
+                new ConfigureExposeEntireTradingScheduleTask(
+                    Settings.settings().exposeEntireTradingSchedule()
+                )
+            )).executeAsync();
+        }
+
+        if (Settings.settings().autoRestart() != null) {
             (new ConfigurationTask(
                 new ConfigureAutoRestartTask(
                     Settings.settings().autoRestart()

@@ -94,8 +94,20 @@ public class SettingsParser {
             parser.getBoolean("DismissNSEComplianceNotice", true));
         _settings.setSendTwsLogsToConsole(
             parser.getBoolean("SendTWSLogsToConsole", false));
-        _settings.setAutoRestart(
-            parser.getBoolean("AutoRestart", false));
+        if (! parser.getString("AutoRestart", "").isEmpty()) {
+            _settings.setAutoRestart(
+                parser.getBoolean("AutoRestart", false));
+        }
+
+        if (! parser.getString("MasterApiClientId", "").isEmpty()) {
+            int masterApiClientId = parser.getInt("MasterApiClientId", 0);
+            _settings.setMasterApiClientId(masterApiClientId);
+        }
+
+        if (! parser.getString("ExposeEntireTradingSchedule", "").isEmpty()) {
+            boolean exposeEntireTradingSchedule = parser.getBoolean("ExposeEntireTradingSchedule", true);
+            _settings.setExposeEntireTradingSchedule(exposeEntireTradingSchedule);
+        }
     }
 
     private void _parseTwsSaveSettingsAt(PropertyParser parser) {

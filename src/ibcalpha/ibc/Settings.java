@@ -341,14 +341,34 @@ public class Settings {
         _sendTwsLogsToConsole = send;
     }
 
-    private boolean _autoRestart = false;
+    private Boolean _autoRestart = null;
 
-    public boolean autoRestart() {
+    public Boolean autoRestart() {
         return _autoRestart;
     }
 
     public void setAutoRestart(boolean autoRestart) {
-        _autoRestart = autoRestart;
+        _autoRestart = Boolean.valueOf(autoRestart);
+    }
+
+    private Integer _masterApiClientId = null;
+
+    public Integer masterApiClientId() {
+        return _masterApiClientId;
+    }
+
+    public void setMasterApiClientId(int masterApiClientId) {
+        _masterApiClientId = Integer.valueOf(masterApiClientId);
+    }
+
+    private Boolean _exposeEntireTradingSchedule = null;
+
+    public Boolean exposeEntireTradingSchedule() {
+        return _exposeEntireTradingSchedule;
+    }
+
+    public void setExposeEntireTradingSchedule(boolean exposeEntireTradingSchedule) {
+        _exposeEntireTradingSchedule = Boolean.valueOf(exposeEntireTradingSchedule);
     }
 
     private boolean _maximizeMainWindow = false;
