@@ -108,6 +108,8 @@ public class SettingsParser {
             boolean exposeEntireTradingSchedule = parser.getBoolean("ExposeEntireTradingSchedule", true);
             _settings.setExposeEntireTradingSchedule(exposeEntireTradingSchedule);
         }
+        _settings.setAcceptFAOrderWarning(
+            parser.getBoolean("AcceptFAOrderWarning", false));
     }
 
     private void _parseTwsSaveSettingsAt(PropertyParser parser) {

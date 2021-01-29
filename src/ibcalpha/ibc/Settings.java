@@ -308,6 +308,15 @@ public class Settings {
         _allowBlindTrading = allowBlindTrading;
     }
 
+    private boolean _acceptFAOrderWarning = false;
+
+    public boolean acceptFAOrderWarning() {
+        return _acceptFAOrderWarning;
+    }
+
+    public void setAcceptFAOrderWarning(boolean acceptFAOrderWarning) {
+        _acceptFAOrderWarning = acceptFAOrderWarning;
+    }
 
     private boolean _minimizeMainWindow = false;
 
