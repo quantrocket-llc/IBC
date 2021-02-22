@@ -99,6 +99,11 @@ public class SettingsParser {
                 parser.getBoolean("AutoRestart", false));
         }
 
+        String autoRestartTime = parser.getString("AutoRestartTime", "");
+        if (! autoRestartTime.isEmpty()) {
+            _settings.setAutoRestartTime(autoRestartTime);
+        }
+
         if (! parser.getString("MasterApiClientId", "").isEmpty()) {
             int masterApiClientId = parser.getInt("MasterApiClientId", 0);
             _settings.setMasterApiClientId(masterApiClientId);

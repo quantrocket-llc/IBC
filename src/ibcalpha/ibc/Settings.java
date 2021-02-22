@@ -360,6 +360,16 @@ public class Settings {
         _autoRestart = Boolean.valueOf(autoRestart);
     }
 
+    private String _autoRestartTime = null;
+
+    public String autoRestartTime() {
+        return _autoRestartTime;
+    }
+
+    public void setAutoRestartTime(String autoRestartTime) {
+        _autoRestartTime = autoRestartTime;
+    }
+
     private Integer _masterApiClientId = null;
 
     public Integer masterApiClientId() {

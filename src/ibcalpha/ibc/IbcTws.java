@@ -385,6 +385,14 @@ public class IbcTws {
             )).executeAsync();
         }
 
+        if (Settings.settings().autoRestartTime() != null) {
+            (new ConfigurationTask(
+                new ConfigureAutoRestartTimeTask(
+                    Settings.settings().autoRestartTime()
+                )
+            )).executeAsync();
+        }
+
         if (Settings.settings().autoRestart() != null) {
             (new ConfigurationTask(
                 new ConfigureAutoRestartTask(
