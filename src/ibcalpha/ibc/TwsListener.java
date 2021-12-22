@@ -58,26 +58,21 @@ class TwsListener implements AWTEventListener {
     }
 
     private void logWindow(Window window, int eventID) {
-        String event = SwingUtils.windowEventToString(eventID);
-
+        final String event = SwingUtils.windowEventToString(eventID);
+        final String windowTitle;
         if (window instanceof JFrame) {
-            Utils.logToConsole("detected JFrame (%s) entitled: %s; event=%s",
-                               window.getClass().getName(),
-                               ((JFrame) window).getTitle(),
-                               event);
+            windowTitle = SwingUtils.getWindowTitle(window);
+            Utils.logToConsole("detected frame entitled: " + windowTitle + "; event=" + event);
         } else if (window instanceof JDialog) {
-            Utils.logToConsole("detected JDialog (%s) entitled: %s; event=%s",
-                               window.getClass().getName(),
-                               ((JDialog) window).getTitle(),
-                               event);
+            windowTitle = SwingUtils.getWindowTitle(window);
+            Utils.logToConsole("detected dialog entitled: " + windowTitle + "; event=" + event);
         } else {
-            Utils.logToConsole("detected Window (%s); event=%s",
-                               window.getClass().getName(),
-                               event);
+            windowTitle = window.getClass().getName();
+            Utils.logToConsole("detected window: type=" + windowTitle + "; event=" + event);
         }
 
-        ComponentLogPolicy policy = Settings.settings().componentLogPolicy();
-        if ((eventID == WindowEvent.WINDOW_OPENED && (policy == ComponentLogPolicy.OPEN || policy == ComponentLogPolicy.ACTIVATE))
+        if (windowTitle.isEmpty() || 
+            (eventID == WindowEvent.WINDOW_OPENED && (logComponents.equals("open") || logComponents.equals("activate")))
             ||
             (eventID == WindowEvent.WINDOW_ACTIVATED && policy == ComponentLogPolicy.ACTIVATE)) {
             Utils.logRawToConsole(SwingUtils.getWindowStructure(window));
