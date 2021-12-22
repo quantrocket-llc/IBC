@@ -288,6 +288,7 @@ public class IbcTws {
         windowHandlers.add(new ApiAnnouncementsDialogHandler());
         windowHandlers.add(new GettingStartedDialogHandler());
         windowHandlers.add(new ConfirmAutoRestartDialogHandler());
+        windowHandlers.add(new BidAskLastSizeDisplayUpdateDialogHandler());
 
         return windowHandlers;
     }
@@ -399,6 +400,13 @@ public class IbcTws {
                     Settings.settings().autoRestart()
                 )
             )).executeAsync();
+        }
+
+        String sendMarketDataInLots = Settings.settings().getString("SendMarketDataInLotsForUSstocks", "");
+        if (!sendMarketDataInLots.equals("")) {
+            (new ConfigurationTask(
+                new ConfigureSendMarketDataInLotsForUSstocksTask(
+                    Settings.settings().getBoolean("SendMarketDataInLotsForUSstocks", true)))).executeAsync();
         }
     }
 
