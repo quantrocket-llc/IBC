@@ -402,11 +402,12 @@ public class IbcTws {
             )).executeAsync();
         }
 
-        String sendMarketDataInLots = Settings.settings().getString("SendMarketDataInLotsForUSstocks", "");
-        if (!sendMarketDataInLots.equals("")) {
+        if (Settings.settings().sendMarketDataInLotsForUSstocks() != null) {
             (new ConfigurationTask(
                 new ConfigureSendMarketDataInLotsForUSstocksTask(
-                    Settings.settings().getBoolean("SendMarketDataInLotsForUSstocks", true)))).executeAsync();
+                    Settings.settings().sendMarketDataInLotsForUSstocks()
+                )
+            )).executeAsync();
         }
     }
 

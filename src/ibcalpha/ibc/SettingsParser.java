@@ -104,6 +104,14 @@ public class SettingsParser {
             _settings.setAutoRestartTime(autoRestartTime);
         }
 
+        if (! parser.getString("SendMarketDataInLotsForUSstocks", "").isEmpty()) {
+            _settings.setSendMarketDataInLotsForUSstocks(
+                parser.getBoolean("SendMarketDataInLotsForUSstocks", false));
+        }
+
+        String acceptBidAskLastSizeDisplayUpdateNotification = parser.getString("AcceptBidAskLastSizeDisplayUpdateNotification", "ignore");
+        _settings.setAcceptBidAskLastSizeDisplayUpdateNotification(acceptBidAskLastSizeDisplayUpdateNotification);
+
         if (! parser.getString("MasterApiClientId", "").isEmpty()) {
             int masterApiClientId = parser.getInt("MasterApiClientId", 0);
             _settings.setMasterApiClientId(masterApiClientId);

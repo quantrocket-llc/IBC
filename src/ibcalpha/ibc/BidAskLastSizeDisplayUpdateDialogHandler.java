@@ -37,8 +37,8 @@ public class BidAskLastSizeDisplayUpdateDialogHandler implements WindowHandler {
 
     @Override
     public void handleWindow(Window window, int eventID) {
-        String accept = Settings.settings().getString("AcceptBidAskLastSizeDisplayUpdateNotification", "ignore");
-        
+        String accept = Settings.settings().acceptBidAskLastSizeDisplayUpdateNotification();
+
         switch(accept) {
             case "ignore":
                 return;
@@ -60,9 +60,12 @@ public class BidAskLastSizeDisplayUpdateDialogHandler implements WindowHandler {
             Utils.logError("could not dismiss AcceptBidAskLastSizeDisplayUpdateNotification - button not found");
         }
 
-        String sendMarketDataInLots = Settings.settings().getString("SendMarketDataInLotsForUSstocks", "");
-        if (!sendMarketDataInLots.equals("")) {
-            (new ConfigurationTask(new ConfigureSendMarketDataInLotsForUSstocksTask(Settings.settings().getBoolean("SendMarketDataInLotsForUSstocks", true)))).executeAsync();
+        if (Settings.settings().sendMarketDataInLotsForUSstocks() != null) {
+            (new ConfigurationTask(
+                new ConfigureSendMarketDataInLotsForUSstocksTask(
+                    Settings.settings().sendMarketDataInLotsForUSstocks()
+                )
+            )).executeAsync();
         }
     }
 
@@ -71,5 +74,5 @@ public class BidAskLastSizeDisplayUpdateDialogHandler implements WindowHandler {
         if (! (window instanceof JDialog)) return false;
         return (SwingUtils.findTextPane(window, "Bid, Ask and Last Size Display Update") != null );
     }
-    
+
 }

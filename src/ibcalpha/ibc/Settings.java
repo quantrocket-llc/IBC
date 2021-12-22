@@ -370,6 +370,27 @@ public class Settings {
         _autoRestartTime = autoRestartTime;
     }
 
+    private Boolean _sendMarketDataInLotsForUSstocks = null;
+
+    public Boolean sendMarketDataInLotsForUSstocks() {
+        return _sendMarketDataInLotsForUSstocks;
+    }
+
+    public void setSendMarketDataInLotsForUSstocks(boolean sendMarketDataInLotsForUSstocks) {
+        _sendMarketDataInLotsForUSstocks = Boolean.valueOf(sendMarketDataInLotsForUSstocks);
+    }
+
+
+    private String _acceptBidAskLastSizeDisplayUpdateNotification = "ignore";
+
+    public String acceptBidAskLastSizeDisplayUpdateNotification() {
+        return _acceptBidAskLastSizeDisplayUpdateNotification;
+    }
+
+    public void setAcceptBidAskLastSizeDisplayUpdateNotification(String acceptBidAskLastSizeDisplayUpdateNotification) {
+        _acceptBidAskLastSizeDisplayUpdateNotification = acceptBidAskLastSizeDisplayUpdateNotification;
+    }
+
     private Integer _masterApiClientId = null;
 
     public Integer masterApiClientId() {
