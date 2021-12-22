@@ -36,6 +36,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
@@ -549,6 +550,30 @@ class SwingUtils {
 
         rb.doClick();
         return true;
+    }
+
+    /**
+     * Traverses a container hierarchy and returns the JTextArea
+     * that contains the given substring.
+     * @param container
+     *  the Container to search in
+     * @param text
+     *  the substring to find in a JTextArea
+     * @return
+     *  the JTextArea, if it was found;  otherwise null
+     */
+    static JTextArea findTextArea(Container container, String text) {
+        ComponentIterator iter = new ComponentIterator(container);
+        while (iter.hasNext()) {
+            Component component = iter.next();
+            if (component instanceof JTextArea) {
+                String content = ((JTextArea)component).getText();
+                if (content != null && content.contains(text)) {
+                    return (JTextArea)component;
+                }
+            }
+        }
+        return null;
     }
 
     /**

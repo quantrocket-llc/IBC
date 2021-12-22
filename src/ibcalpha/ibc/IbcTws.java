@@ -289,6 +289,7 @@ public class IbcTws {
         windowHandlers.add(new GettingStartedDialogHandler());
         windowHandlers.add(new ConfirmAutoRestartDialogHandler());
         windowHandlers.add(new BidAskLastSizeDisplayUpdateDialogHandler());
+        windowHandlers.add(new LoginErrorDialogHandler());
 
         return windowHandlers;
     }
