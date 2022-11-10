@@ -22,6 +22,9 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -41,6 +44,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
+import javax.swing.ListModel;
 import javax.swing.MenuElement;
 import javax.swing.tree.TreeModel;
 
@@ -60,16 +64,20 @@ class SwingUtils {
     static boolean clickButton(final Window window, final String buttonText) {
         final JButton button = findButton(window, buttonText);
         if (button == null) return false;
+        clickButton(button);
+        return true;
+    }
 
+    static void clickButton(final JButton button) {
         if (! button.isEnabled()) {
             button.setEnabled(true);
-            Utils.logToConsole("Button was disabled, has been enabled: " + buttonText);
+            Utils.logToConsole("Button was disabled, has been enabled: " + button.getText());
         }
 
-        Utils.logToConsole("Click button: " + buttonText);
+        Utils.logToConsole("Click button: " + button.getText());
         button.doClick();
-        if (! button.isEnabled()) Utils.logToConsole("Button now disabled: " + buttonText);
-        return true;
+        if (! button.isEnabled()) Utils.logToConsole("Button now disabled: " + button.getText());
+        return;
     }
 
     /**
@@ -185,6 +193,52 @@ class SwingUtils {
         while (iter.hasNext()) {
             Component component = iter.next();
             if (component instanceof JLabel && ((JLabel)component).getText() != null &&  ((JLabel)component).getText().contains(text)) return (JLabel)component;
+        }
+        return null;
+    }
+
+    /**
+     * Traverses a container hierarchy and returns the ith JList
+     * (0 based indexing).
+     *
+     * @param container
+     *  the Container to search in
+     * @param ith
+     *   specifies which JList to return (the first one is specified by 0,
+     * the next by 1, etc)
+     * @return
+     *  the required JList if it is found, otherwise null
+     */
+    static JList<?> findList(Container container, int ith) {
+        ComponentIterator iter = new ComponentIterator(container);
+        int i = 0;
+        while (iter.hasNext()) {
+            Component component = iter.next();
+            if (component instanceof JList<?> && i++ == ith) return (JList<?>)component;
+        }
+        return null;
+    }
+
+    /**
+     * Traverses a container hierarchy and returns the JTextArea
+     * that contains the given substring.
+     * @param container
+     *  the Container to search in
+     * @param text
+     *  the substring to find in a JTextArea
+     * @return
+     *  the JTextArea, if it was found;  otherwise null
+     */
+    static JTextArea findTextArea(Container container, String text) {
+        ComponentIterator iter = new ComponentIterator(container);
+        while (iter.hasNext()) {
+            Component component = iter.next();
+            if (component instanceof JTextArea) {
+                String content = ((JTextArea)component).getText();
+                if (content != null && content.contains(text)) {
+                    return (JTextArea)component;
+                }
+            }
         }
         return null;
     }
@@ -507,7 +561,15 @@ class SwingUtils {
      */
     static String getWindowStructure(Window window) {
         StringBuilder builder = new StringBuilder();
-        for (Component component : window.getComponents()) appendComponentStructure(component, builder);
+        try {
+            for (Component component : window.getComponents()) appendComponentStructure(component, builder);
+        } catch (Exception e) {
+            builder.append("Exception occurred while generating window structure: ");
+            builder.append(e.toString());
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            builder.append(sw.toString());
+        }
         builder.append(NEWLINE);
         builder.append(NEWLINE);
         return builder.toString();
@@ -550,30 +612,6 @@ class SwingUtils {
 
         rb.doClick();
         return true;
-    }
-
-    /**
-     * Traverses a container hierarchy and returns the JTextArea
-     * that contains the given substring.
-     * @param container
-     *  the Container to search in
-     * @param text
-     *  the substring to find in a JTextArea
-     * @return
-     *  the JTextArea, if it was found;  otherwise null
-     */
-    static JTextArea findTextArea(Container container, String text) {
-        ComponentIterator iter = new ComponentIterator(container);
-        while (iter.hasNext()) {
-            Component component = iter.next();
-            if (component instanceof JTextArea) {
-                String content = ((JTextArea)component).getText();
-                if (content != null && content.contains(text)) {
-                    return (JTextArea)component;
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -623,7 +661,7 @@ class SwingUtils {
      */
     static boolean titleEquals(Window window, String text) {
         String title = getWindowTitle(window);
-        return (title != null && title.equals(text));
+        return (title != null && title.equalsIgnoreCase(text));
     }
 
     static String windowEventToString(int eventID) {
@@ -653,13 +691,15 @@ class SwingUtils {
         }
     }
 
-    private static String getWindowTitle(Window window) {
-        String title = null;
+    static final String NO_TITLE = "** no title **";
+      static String getWindowTitle(Window window) {
+        String title = NO_TITLE;
         if (window instanceof JDialog) {
             title = ((JDialog)window).getTitle();
         } else  if (window instanceof JFrame) {
             title =((JFrame)window).getTitle();
         }
+        if (title == null) title = NO_TITLE;
         return title;
     }
 
@@ -684,9 +724,15 @@ class SwingUtils {
         } else if (component instanceof JPasswordField) {
             s += "JPasswordField: ";
             s += "***";
+        } else if (component instanceof JTextArea) {
+            s += "JTextArea: ";
+            s += ((JTextArea) component).getText();
         } else if (component instanceof JTextField) {
             s += "JTextField: ";
             s += ((JTextField) component).getText();
+        } else if (component instanceof JTextPane) {
+            s += "JTextPane: ";
+            s += ((JTextPane) component).getText();
         } else if (component instanceof JMenuBar) {
             s += "JMenuBar: ";
             s += ((JMenuBar) component).getName();
@@ -734,10 +780,28 @@ class SwingUtils {
         builder.append(getComponentDetails(component));
         builder.append("}");
         if (component instanceof JTree) appendTreeNodes(((JTree) component).getModel(), ((JTree) component).getModel().getRoot(), builder, "|   " + indent);
+        if (component instanceof JList<?>) appendListItems(((JList<?>) component).getModel(), builder, "|   " + indent);
+        if (component instanceof JComboBox<?>) appendComboItems(((JComboBox<?>) component).getModel(), builder, "|   " + indent);
         if (component instanceof JMenuBar) {
             appendMenuItem(component, builder, "|   " + indent);
         } else if (component instanceof Container) {
             for (Component subComponent : ((Container)component).getComponents()) appendComponentStructure(subComponent, builder, "|   " + indent);
+        }
+    }
+
+    private static void appendComboItems(ComboBoxModel<?> model, StringBuilder builder, String indent) {
+        for (int i = 0; i < model.getSize(); i++) {
+            builder.append(NEWLINE);
+            builder.append(indent);
+            builder.append(model.getElementAt(i).toString());
+        }
+    }
+
+    private static void appendListItems(ListModel<?> model, StringBuilder builder, String indent) {
+        for (int i = 0; i < model.getSize(); i++) {
+            builder.append(NEWLINE);
+            builder.append(indent);
+            builder.append(model.getElementAt(i).toString());
         }
     }
 

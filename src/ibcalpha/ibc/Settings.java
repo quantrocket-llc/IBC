@@ -370,6 +370,16 @@ public class Settings {
         _autoRestartTime = autoRestartTime;
     }
 
+    private String _secondFactorDevice = null;
+
+    public String secondFactorDevice() {
+        return _secondFactorDevice;
+    }
+
+    public void setSecondFactorDevice(String secondFactorDevice) {
+        _secondFactorDevice = secondFactorDevice;
+    }
+
     private Boolean _sendMarketDataInLotsForUSstocks = null;
 
     public Boolean sendMarketDataInLotsForUSstocks() {

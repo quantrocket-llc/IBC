@@ -104,6 +104,11 @@ public class SettingsParser {
             _settings.setAutoRestartTime(autoRestartTime);
         }
 
+        String secondFactorDevice = parser.getString("SecondFactorDevice", "");
+        if (! secondFactorDevice.isEmpty()) {
+            _settings.setSecondFactorDevice(secondFactorDevice);
+        }
+
         if (! parser.getString("SendMarketDataInLotsForUSstocks", "").isEmpty()) {
             _settings.setSendMarketDataInLotsForUSstocks(
                 parser.getBoolean("SendMarketDataInLotsForUSstocks", false));
