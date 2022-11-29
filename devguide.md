@@ -5,7 +5,7 @@
 * install ant:
     * MacOS: `brew install ant`
 * make sure IB Gateway is installed
-* set env var pointing to IB Gateway jar files, for example: `export IBC_BIN=${HOME}/Applications/IBGateway978/jars/`
+* set env var pointing to IB Gateway jar files, for example: `export IBC_BIN=${HOME}/Applications/IBGateway10.20/jars/`
 * change to top-level of project, for example: `cd IBC`
 * edit `<property name="ver">` in build.xml with the desired version number
 * run without args: `ant`

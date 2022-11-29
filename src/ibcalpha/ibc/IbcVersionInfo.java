@@ -3,5 +3,5 @@
 package ibcalpha.ibc;
 
 public class IbcVersionInfo {
-    public final static String IBC_VERSION = "qr3.12.1.0";
+    public final static String IBC_VERSION = "qr3.12.2.0";
 }
