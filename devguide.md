@@ -11,6 +11,11 @@
 * run without args: `ant`
 * commit `IBC.jar` to repository
 
+## Test
+
+* copy `IBC.jar` to container:
+    * `docker cp resources/IBC.jar quantrocket-ibg1-1:/opt/IBC/IBC.jar`
+
 ## Deploy
 
 In Java Agent Mode, only the `IBC.jar` file is needed, so it is possible to simply download the jar file into deployment environments.

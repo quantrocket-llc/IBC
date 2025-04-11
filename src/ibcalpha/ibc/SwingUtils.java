@@ -113,7 +113,12 @@ class SwingUtils {
         ComponentIterator iter = new ComponentIterator(container);
         while (iter.hasNext()) {
             Component component = iter.next();
-            if (component instanceof JCheckBox && text.equals(((JCheckBox)component).getText())) return (JCheckBox)component;
+            if (component instanceof JCheckBox) {
+                String checkboxText = ((JCheckBox) component).getText();
+                if (checkboxText != null && checkboxText.startsWith(text)) {
+                    return (JCheckBox) component;
+                }
+            }
         }
         return null;
     }
